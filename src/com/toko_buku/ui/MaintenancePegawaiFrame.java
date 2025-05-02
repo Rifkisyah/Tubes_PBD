@@ -62,13 +62,13 @@ public class MaintenancePegawaiFrame extends javax.swing.JFrame {
         TableColumn column;
         TabelPegawai.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         column = TabelPegawai.getColumnModel().getColumn(0);
-        column.setPreferredWidth(75);
+        column.setPreferredWidth(100);
         column = TabelPegawai.getColumnModel().getColumn(1);
         column.setPreferredWidth(200);
         column = TabelPegawai.getColumnModel().getColumn(2);
-        column.setPreferredWidth(75);
+        column.setPreferredWidth(300);
         column = TabelPegawai.getColumnModel().getColumn(3);
-        column.setPreferredWidth(75);
+        column.setPreferredWidth(100);
         column = TabelPegawai.getColumnModel().getColumn(4);
         column.setPreferredWidth(100);
         column = TabelPegawai.getColumnModel().getColumn(5);
@@ -489,7 +489,7 @@ public class MaintenancePegawaiFrame extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Terdapat Data Yangg Masih Kosong!");
             txt_iduser.requestFocus();
         } else {
-            if(kodeUser.length() == 8){
+            if(kodeUser.length() >= 6){
                 if(pass.equals(konfPass)){
                     cekRoleId();
                 } else {

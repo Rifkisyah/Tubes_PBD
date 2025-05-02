@@ -39,9 +39,9 @@ public class RoleFrame extends javax.swing.JFrame {
     public void HeaderTable() throws ClassNotFoundException{
         model = new DefaultTableModel();
         roleTable.setModel(model);
-        model.addColumn("Role Id");
-        model.addColumn("Role Name");
-        model.addColumn("Date Create");
+        model.addColumn("Id Role");
+        model.addColumn("Nama Role");
+        model.addColumn("Tanggal Buat Akun");
         columnWrapping();
         viewRole();
     }
@@ -76,10 +76,10 @@ public class RoleFrame extends javax.swing.JFrame {
     
     private void deleteData(){
 //        this.roleid = (Integer) model.getValueAt(roleTable.getSelectedRow(), 1);
-        String rolename = roleNameSearchField.getText();
+        String rolename = InputIdRole.getText();
         if(rolename.isEmpty()){
             JOptionPane.showMessageDialog(null, "Nama Role Masih Kosong!");
-            roleNameSearchField.requestFocus();
+            InputIdRole.requestFocus();
         } else{
             try {
                 DbConnection ctd = new DbConnection();
@@ -90,7 +90,7 @@ public class RoleFrame extends javax.swing.JFrame {
                 preparedStatement.executeUpdate();
                 model.getDataVector().removeAllElements();
                 model.fireTableDataChanged();
-                roleNameSearchField.setText("");
+                InputIdRole.setText("");
                 viewRole();
                 
                 JOptionPane.showMessageDialog(null, "Data Berhasil Dihapus");
@@ -113,12 +113,14 @@ public class RoleFrame extends javax.swing.JFrame {
 
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        roleNameSearchField = new javax.swing.JTextField();
+        InputIdRole = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
         roleTable = new javax.swing.JTable();
         SaveButton = new javax.swing.JButton();
         exitButton = new javax.swing.JButton();
         clearButton = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
+        InputNamaRole = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -126,12 +128,12 @@ public class RoleFrame extends javax.swing.JFrame {
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("Role Pegawai");
 
-        jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel2.setText("Nama Role");
+        jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel2.setText("ID Role");
 
-        roleNameSearchField.addActionListener(new java.awt.event.ActionListener() {
+        InputIdRole.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                roleNameSearchFieldActionPerformed(evt);
+                InputIdRoleActionPerformed(evt);
             }
         });
 
@@ -186,6 +188,9 @@ public class RoleFrame extends javax.swing.JFrame {
             }
         });
 
+        jLabel3.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel3.setText("Nama Role");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -203,7 +208,11 @@ public class RoleFrame extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(roleNameSearchField)))
+                        .addComponent(InputIdRole))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(InputNamaRole)))
                 .addContainerGap(23, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -218,15 +227,19 @@ public class RoleFrame extends javax.swing.JFrame {
                 .addGap(35, 35, 35)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
-                    .addComponent(roleNameSearchField, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(36, 36, 36)
+                    .addComponent(InputIdRole, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(InputNamaRole, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel3))
+                .addGap(34, 34, 34)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(46, 46, 46)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(SaveButton)
                     .addComponent(clearButton)
                     .addComponent(exitButton))
-                .addContainerGap(69, Short.MAX_VALUE))
+                .addContainerGap(27, Short.MAX_VALUE))
         );
 
         pack();
@@ -253,52 +266,66 @@ public class RoleFrame extends javax.swing.JFrame {
     private void SaveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SaveButtonActionPerformed
         try {
             DbConnection ctd = new DbConnection();
-            String rolename = roleNameSearchField.getText().trim(); 
+            String rolename = InputIdRole.getText().trim();
+            String idRole = InputIdRole.getText().trim();
             Date tanggal = new Date();
             SimpleDateFormat formatTanggal = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String tanggaldibuat = formatTanggal.format(tanggal);
             boolean roleExists = false;
-            String datecreate = null;
-            
-            do {
-                this.idrole = generateRandomId();
-            } while (isRoleIdExists(ctd.getConnection(), idrole));
+            String tanggalBuat;
+           
 
             if (rolename.isEmpty()) {
                 JOptionPane.showMessageDialog(null, "Nama Role Masih Kosong!");
-                roleNameSearchField.requestFocus();
+                InputIdRole.requestFocus();
             } else {
                 Connection conn = ctd.getConnection();
-                
+
                 String checkQuery = "SELECT Id_Role, Tanggal_Buat FROM T_Role WHERE Nama_Role = ?";
                 try (PreparedStatement checkStatement = conn.prepareStatement(checkQuery)) {
                     checkStatement.setString(1, rolename);
                     try (ResultSet rs = checkStatement.executeQuery()) {
                         if (rs.next()) {
                             roleExists = true;
-                            idrole = rs.getString("Id_Role"); 
-                            datecreate = rs.getString("Tanggal_Buat"); 
+                            idRole = rs.getString("Id_Role"); 
+                            tanggalBuat = rs.getString("Tanggal_Buat"); 
                         }
                     }
                 }
+
+                if (roleExists) {
+                    // Proses Update jika role sudah ada
+                    String updateQuery = "UPDATE T_Role SET Tanggal_Buat = ? WHERE Id_Role = ?";
+                    try (PreparedStatement updateStatement = conn.prepareStatement(updateQuery)) {
+                        updateStatement.setString(1, tanggaldibuat); // atau gunakan kolom lain untuk diupdate
+                        updateStatement.setString(2, idRole);
+
+                        int rowsUpdated = updateStatement.executeUpdate();
+                        if (rowsUpdated > 0) {
+                            InputNamaRole.setText("");
+                            InputIdRole.setText("");
+                            viewRole();
+                            JOptionPane.showMessageDialog(null, "Data Berhasil Diperbarui");
+                        } else {
+                            JOptionPane.showMessageDialog(null, "Data Gagal Diperbarui");
+                        }
+                    }
+                } else {
+                    // Proses Insert jika role belum ada
                     String insertQuery = "INSERT INTO T_Role (Id_Role, Nama_Role, Tanggal_Buat) VALUES (?, ?, ?)";
-                    try (PreparedStatement preparedStatement = conn.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS)) {
-                        preparedStatement.setString(1, idrole);
+                    try (PreparedStatement preparedStatement = conn.prepareStatement(insertQuery)) {
+                        preparedStatement.setString(1, idRole);
                         preparedStatement.setString(2, rolename);
                         preparedStatement.setString(3, tanggaldibuat);
 
                         int dataInserted = preparedStatement.executeUpdate();
 
                         if (dataInserted > 0) {
-                            try (ResultSet generatedKey = preparedStatement.getGeneratedKeys()) {
-                                if (generatedKey.next()) {
-                                    idrole = generatedKey.getString(1); 
-                                }
-                            }
-                            model.addRow(new Object[]{idrole, rolename, tanggaldibuat, null});
+                            model.addRow(new Object[]{idRole, rolename, tanggaldibuat, null});
                             model.getDataVector().removeAllElements();
                             model.fireTableDataChanged();
-                            roleNameSearchField.setText("");
+                            InputIdRole.setText("");
+                            InputNamaRole.setText("");
                             viewRole();
                             JOptionPane.showMessageDialog(null, "Data Berhasil Disimpan");
                         } else {
@@ -306,6 +333,7 @@ public class RoleFrame extends javax.swing.JFrame {
                         }
                     } catch (SQLException sq){
                         sq.printStackTrace();
+                    }
                 }
             }
         } catch (SQLException e) {
@@ -316,13 +344,13 @@ public class RoleFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_SaveButtonActionPerformed
 
     private void roleTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_roleTableMouseClicked
-        roleNameSearchField.setText(model.getValueAt(roleTable.getSelectedRow(), 1) + "");
-//        this.roleid = (int) model.getValueAt(roleTable.getSelectedRow(), 1);
+        InputIdRole.setText(model.getValueAt(roleTable.getSelectedRow(), 0) + "");
+        InputIdRole.setText(model.getValueAt(roleTable.getSelectedRow(), 1) + "");
     }//GEN-LAST:event_roleTableMouseClicked
 
-    private void roleNameSearchFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_roleNameSearchFieldActionPerformed
+    private void InputIdRoleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_InputIdRoleActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_roleNameSearchFieldActionPerformed
+    }//GEN-LAST:event_InputIdRoleActionPerformed
 
     private void columnWrapping(){
         TableColumn column;
@@ -346,25 +374,20 @@ public class RoleFrame extends javax.swing.JFrame {
     }
 
     
-    private String generateRandomId() {
-        Random rand = new Random();
-        int angka = 100000 + rand.nextInt(900000);
-        return "RLE" + angka;
-    }
-
-    
     /**
      * @param args the command line arguments
      */
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextField InputIdRole;
+    private javax.swing.JTextField InputNamaRole;
     private javax.swing.JButton SaveButton;
     private javax.swing.JButton clearButton;
     private javax.swing.JButton exitButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextField roleNameSearchField;
     private javax.swing.JTable roleTable;
     // End of variables declaration//GEN-END:variables
 }
