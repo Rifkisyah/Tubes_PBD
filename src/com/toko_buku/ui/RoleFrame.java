@@ -43,57 +43,56 @@ public class RoleFrame extends javax.swing.JFrame {
         model.addColumn("Nama Role");
         model.addColumn("Tanggal Buat Akun");
         columnWrapping();
-        viewRole();
+        dataRoleKeTabel();
     }
     
-    public void viewRole() throws ClassNotFoundException{
+    public void dataRoleKeTabel() throws ClassNotFoundException{
         DbConnection ctd = new DbConnection();
-         
-        
         try{
             Connection conn = ctd.getConnection();
             Statement statement = (Statement) conn.createStatement();
             String query = "SELECT *FROM T_Role";
-//            ResultSet rst = ((java.sql.Statement) statement).executeQuery(query);
             PreparedStatement preparedStatement = conn.prepareStatement(query);
             ResultSet rs = preparedStatement.executeQuery();
             
-            while (rs.next()) {
-                
-                Object [] fieldx = new Object[3];
+            model.setRowCount(0);
+            
+            while (rs.next()) {    
+            Object[] fieldx = new Object[4];
                 fieldx[0] = rs.getString("Id_Role");
                 fieldx[1] = rs.getString("Nama_Role");
                 fieldx[2] = rs.getString("Tanggal_Buat");
-                
                 model.addRow(fieldx);
             }
-            
-            
         } catch (SQLException e){
             e.printStackTrace();
         }
     }
     
-    private void deleteData(){
-//        this.roleid = (Integer) model.getValueAt(roleTable.getSelectedRow(), 1);
-        String rolename = InputIdRole.getText();
-        if(rolename.isEmpty()){
+    private void hapusData(){
+        String idRole = InputIdRole.getText().trim();
+        if(idRole.isEmpty()){
             JOptionPane.showMessageDialog(null, "Nama Role Masih Kosong!");
             InputIdRole.requestFocus();
-        } else{
+        } else {
             try {
                 DbConnection ctd = new DbConnection();
                 Connection conn = ctd.getConnection();
-                String query = "DELETE FROM T_Role WHERE Nama_Role=?";
+                String query = "DELETE FROM T_Role WHERE Id_Role=?";
                 PreparedStatement preparedStatement = conn.prepareStatement(query);
-                preparedStatement.setString(1, rolename);
-                preparedStatement.executeUpdate();
-                model.getDataVector().removeAllElements();
-                model.fireTableDataChanged();
-                InputIdRole.setText("");
-                viewRole();
-                
-                JOptionPane.showMessageDialog(null, "Data Berhasil Dihapus");
+                preparedStatement.setString(1, idRole);
+
+                int deleted = preparedStatement.executeUpdate();
+                if (deleted > 0) {
+                    model.getDataVector().removeAllElements();
+                    model.fireTableDataChanged();
+                    InputIdRole.setText("");
+                    InputNamaRole.setText("");
+                    dataRoleKeTabel();
+                    JOptionPane.showMessageDialog(null, "Data Berhasil Dihapus");
+                } else {
+                    JOptionPane.showMessageDialog(null, "ID Tidak Ditemukan atau Tidak Dihapus");
+                }
             } catch (ClassNotFoundException e){
                 Logger.getLogger(RoleFrame.class.getName()).log(Level.SEVERE, null, e);
             } catch (SQLException ex) {
@@ -130,12 +129,6 @@ public class RoleFrame extends javax.swing.JFrame {
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel2.setText("ID Role");
-
-        InputIdRole.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                InputIdRoleActionPerformed(evt);
-            }
-        });
 
         roleTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -233,8 +226,8 @@ public class RoleFrame extends javax.swing.JFrame {
                     .addComponent(InputNamaRole, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel3))
                 .addGap(34, 34, 34)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(46, 46, 46)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(SaveButton)
                     .addComponent(clearButton)
@@ -248,7 +241,7 @@ public class RoleFrame extends javax.swing.JFrame {
     private void clearButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearButtonActionPerformed
         int deleting = JOptionPane.showConfirmDialog(this, "Apakah Kamu Yakin Ingin Menghapus Data Ini?");
         if(deleting == JOptionPane.YES_OPTION){
-            deleteData();
+            hapusData();
         } else {
             JOptionPane.showMessageDialog(null, "data Berhasil Dihapus");
         }
@@ -266,95 +259,83 @@ public class RoleFrame extends javax.swing.JFrame {
     private void SaveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SaveButtonActionPerformed
         try {
             DbConnection ctd = new DbConnection();
-            String rolename = InputIdRole.getText().trim();
+            String rolename = InputNamaRole.getText().trim();
             String idRole = InputIdRole.getText().trim();
             Date tanggal = new Date();
             SimpleDateFormat formatTanggal = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String tanggaldibuat = formatTanggal.format(tanggal);
-            boolean roleExists = false;
-            String tanggalBuat;
-           
 
-            if (rolename.isEmpty()) {
-                JOptionPane.showMessageDialog(null, "Nama Role Masih Kosong!");
+            if (rolename.isEmpty() || idRole.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "ID atau Nama Role masih kosong!");
                 InputIdRole.requestFocus();
-            } else {
-                Connection conn = ctd.getConnection();
-
-                String checkQuery = "SELECT Id_Role, Tanggal_Buat FROM T_Role WHERE Nama_Role = ?";
-                try (PreparedStatement checkStatement = conn.prepareStatement(checkQuery)) {
-                    checkStatement.setString(1, rolename);
-                    try (ResultSet rs = checkStatement.executeQuery()) {
-                        if (rs.next()) {
-                            roleExists = true;
-                            idRole = rs.getString("Id_Role"); 
-                            tanggalBuat = rs.getString("Tanggal_Buat"); 
-                        }
-                    }
-                }
-
-                if (roleExists) {
-                    // Proses Update jika role sudah ada
-                    String updateQuery = "UPDATE T_Role SET Tanggal_Buat = ? WHERE Id_Role = ?";
-                    try (PreparedStatement updateStatement = conn.prepareStatement(updateQuery)) {
-                        updateStatement.setString(1, tanggaldibuat); // atau gunakan kolom lain untuk diupdate
-                        updateStatement.setString(2, idRole);
-
-                        int rowsUpdated = updateStatement.executeUpdate();
-                        if (rowsUpdated > 0) {
-                            InputNamaRole.setText("");
-                            InputIdRole.setText("");
-                            viewRole();
-                            JOptionPane.showMessageDialog(null, "Data Berhasil Diperbarui");
-                        } else {
-                            JOptionPane.showMessageDialog(null, "Data Gagal Diperbarui");
-                        }
-                    }
-                } else {
-                    // Proses Insert jika role belum ada
-                    String insertQuery = "INSERT INTO T_Role (Id_Role, Nama_Role, Tanggal_Buat) VALUES (?, ?, ?)";
-                    try (PreparedStatement preparedStatement = conn.prepareStatement(insertQuery)) {
-                        preparedStatement.setString(1, idRole);
-                        preparedStatement.setString(2, rolename);
-                        preparedStatement.setString(3, tanggaldibuat);
-
-                        int dataInserted = preparedStatement.executeUpdate();
-
-                        if (dataInserted > 0) {
-                            model.addRow(new Object[]{idRole, rolename, tanggaldibuat, null});
-                            model.getDataVector().removeAllElements();
-                            model.fireTableDataChanged();
-                            InputIdRole.setText("");
-                            InputNamaRole.setText("");
-                            viewRole();
-                            JOptionPane.showMessageDialog(null, "Data Berhasil Disimpan");
-                        } else {
-                            JOptionPane.showMessageDialog(null, "Data Gagal Disimpan");
-                        }
-                    } catch (SQLException sq){
-                        sq.printStackTrace();
-                    }
-                }
+                return;
             }
+
+            Connection conn = ctd.getConnection();
+
+            // 🔄 Cek berdasarkan ID Role, bukan Nama
+            String checkQuery = "SELECT COUNT(*) FROM T_Role WHERE Id_Role = ?";
+                try (PreparedStatement checkStmt = conn.prepareStatement(checkQuery)) {
+                    checkStmt.setString(1, idRole);
+                    ResultSet rs = checkStmt.executeQuery();
+                    rs.next();
+                    int count = rs.getInt(1);
+
+                    if (count > 0) {
+                        // 🔁 UPDATE
+                        String updateQuery = "UPDATE T_Role SET Nama_Role = ? WHERE Id_Role = ?";
+                        try (PreparedStatement updateStatement = conn.prepareStatement(updateQuery)) {
+                            updateStatement.setString(1, rolename);
+                            updateStatement.setString(2, idRole);
+
+                            int rowsUpdated = updateStatement.executeUpdate();
+                            if (rowsUpdated > 0) {
+                                InputNamaRole.setText("");
+                                InputIdRole.setText("");
+                                dataRoleKeTabel();
+                                JOptionPane.showMessageDialog(null, "Data Berhasil Diperbarui");
+                            } else {
+                                JOptionPane.showMessageDialog(null, "Data Gagal Diperbarui");
+                            }
+                        }
+                    } else {
+                        // ➕ INSERT
+                        String insertQuery = "INSERT INTO T_Role (Id_Role, Nama_Role, Tanggal_Buat) VALUES (?, ?, ?)";
+                        try (PreparedStatement preparedStatement = conn.prepareStatement(insertQuery)) {
+                            preparedStatement.setString(1, idRole);
+                            preparedStatement.setString(2, rolename);
+                            preparedStatement.setString(3, tanggaldibuat);
+
+                            int dataInserted = preparedStatement.executeUpdate();
+
+                            if (dataInserted > 0) {
+                                model.getDataVector().removeAllElements();
+                                model.fireTableDataChanged();
+                                InputIdRole.setText("");
+                                InputNamaRole.setText("");
+                                dataRoleKeTabel();
+                                JOptionPane.showMessageDialog(null, "Data Berhasil Disimpan");
+                            } else {
+                                JOptionPane.showMessageDialog(null, "Data Gagal Disimpan");
+                            }
+                        }
+                    }
+                }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, "SQL Error: " + e.getMessage());
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(RoleFrame.class.getName()).log(Level.SEVERE, null, ex);
-        }                           
+        }                     
     }//GEN-LAST:event_SaveButtonActionPerformed
 
     private void roleTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_roleTableMouseClicked
         InputIdRole.setText(model.getValueAt(roleTable.getSelectedRow(), 0) + "");
-        InputIdRole.setText(model.getValueAt(roleTable.getSelectedRow(), 1) + "");
+        InputNamaRole.setText(model.getValueAt(roleTable.getSelectedRow(), 1) + "");
     }//GEN-LAST:event_roleTableMouseClicked
-
-    private void InputIdRoleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_InputIdRoleActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_InputIdRoleActionPerformed
 
     private void columnWrapping(){
         TableColumn column;
-        roleTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        roleTable.setAutoResizeMode(roleTable.AUTO_RESIZE_OFF);
         column = roleTable.getColumnModel().getColumn(0);
         column.setPreferredWidth(150);
         column = roleTable.getColumnModel().getColumn(1);

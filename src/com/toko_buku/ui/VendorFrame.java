@@ -39,7 +39,7 @@ public class VendorFrame extends javax.swing.JFrame {
         model.addColumn("Alamat Vendor");
         model.addColumn("Kontak Vendor");
         columnWrapping();
-        viewRole();
+        dataVendorKeTabel();
     }
     
     private void columnWrapping(){
@@ -55,7 +55,7 @@ public class VendorFrame extends javax.swing.JFrame {
         column.setPreferredWidth(200);
     }
     
-    public void viewRole() throws ClassNotFoundException{
+    public void dataVendorKeTabel() throws ClassNotFoundException{
         DbConnection ctd = new DbConnection();
         try{
             Connection conn = ctd.getConnection();
@@ -71,7 +71,7 @@ public class VendorFrame extends javax.swing.JFrame {
             fieldx[1] = rs.getString("Nama_Vendor");
             fieldx[2] = rs.getString("Alamat_Vendor");
             fieldx[3] = rs.getString("Kontak_Vendor");
-                model.addRow(fieldx);
+            model.addRow(fieldx);
             }
         } catch (SQLException e){
             e.printStackTrace();
@@ -98,7 +98,7 @@ public class VendorFrame extends javax.swing.JFrame {
                 model.getDataVector().removeAllElements();
                 model.fireTableDataChanged();
                 clearinput();
-                viewRole();
+                dataVendorKeTabel();
                 JOptionPane.showMessageDialog(null, "Vendor Berhasil Dihapus");
                 
             } catch (ClassNotFoundException e){
@@ -289,14 +289,14 @@ public class VendorFrame extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(FieldinputKontakVendor, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 28, Short.MAX_VALUE)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(TombolSimpan)
                     .addComponent(TombolDelete)
                     .addComponent(TombolKeluar))
-                .addGap(40, 40, 40))
+                .addGap(21, 21, 21))
         );
 
         pack();
@@ -358,7 +358,7 @@ public class VendorFrame extends javax.swing.JFrame {
                                 model.getDataVector().removeAllElements();
                                 model.fireTableDataChanged();
                                 clearinput();
-                                viewRole(); // Pastikan fungsi ini sesuai konteksnya
+                                dataVendorKeTabel(); // Pastikan fungsi ini sesuai konteksnya
                                 JOptionPane.showMessageDialog(null, "Data Berhasil Diperbarui");
                             } else {
                                 JOptionPane.showMessageDialog(null, "Data Gagal Diperbarui");
@@ -381,7 +381,7 @@ public class VendorFrame extends javax.swing.JFrame {
                                 model.getDataVector().removeAllElements();
                                 model.fireTableDataChanged();
                                 clearinput();
-                                viewRole();
+                                dataVendorKeTabel();
                                 JOptionPane.showMessageDialog(null, "Data Berhasil Disimpan");
                             } else {
                                 JOptionPane.showMessageDialog(null, "Data Gagal Disimpan");

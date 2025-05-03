@@ -48,18 +48,18 @@
                       </Group>
                       <EmptySpace min="-2" pref="23" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="JComboRole" min="-2" pref="187" max="-2" attributes="0"/>
+                          <Component id="ComboBoxRolePegawai" min="-2" pref="187" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" alignment="0" attributes="0">
-                                  <Component id="txt_pass" pref="178" max="32767" attributes="0"/>
+                                  <Component id="FieldInputPassword" pref="178" max="32767" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="jLabel6" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="txt_confPass" min="-2" pref="178" max="-2" attributes="0"/>
+                                  <Component id="FieldInputConfirmPassword" min="-2" pref="178" max="-2" attributes="0"/>
                               </Group>
-                              <Component id="txt_name" max="32767" attributes="0"/>
+                              <Component id="FieldInputNamaPegawai" max="32767" attributes="0"/>
                               <Group type="102" attributes="0">
-                                  <Component id="txt_iduser" min="-2" pref="186" max="-2" attributes="0"/>
+                                  <Component id="FieldInputIdPegawai" min="-2" pref="186" max="-2" attributes="0"/>
                                   <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                               </Group>
                           </Group>
@@ -78,26 +78,26 @@
               <EmptySpace min="-2" pref="40" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="txt_iduser" alignment="3" min="-2" pref="30" max="-2" attributes="0"/>
+                  <Component id="FieldInputIdPegawai" alignment="3" min="-2" pref="30" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="txt_name" alignment="3" min="-2" pref="30" max="-2" attributes="0"/>
+                  <Component id="FieldInputNamaPegawai" alignment="3" min="-2" pref="30" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="jLabel4" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Group type="103" alignment="0" groupAlignment="3" attributes="0">
-                      <Component id="txt_pass" alignment="3" min="-2" pref="30" max="-2" attributes="0"/>
+                      <Component id="FieldInputPassword" alignment="3" min="-2" pref="30" max="-2" attributes="0"/>
                       <Component id="jLabel6" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="txt_confPass" alignment="3" min="-2" pref="30" max="-2" attributes="0"/>
+                      <Component id="FieldInputConfirmPassword" alignment="3" min="-2" pref="30" max="-2" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace min="-2" pref="16" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
-                  <Component id="JComboRole" min="-2" pref="30" max="-2" attributes="0"/>
+                  <Component id="ComboBoxRolePegawai" min="-2" pref="30" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jScrollPane1" min="-2" pref="182" max="-2" attributes="0"/>
@@ -113,12 +113,12 @@
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="javax.swing.JTextField" name="txt_confPass">
+    <Component class="javax.swing.JTextField" name="FieldInputConfirmPassword">
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txt_confPassActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="FieldInputConfirmPasswordActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JComboBox" name="JComboRole">
+    <Component class="javax.swing.JComboBox" name="ComboBoxRolePegawai">
       <Properties>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
           <StringArray count="4">
@@ -129,7 +129,7 @@
           </StringArray>
         </Property>
         <Property name="selectedItem" type="java.lang.Object" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection component="JComboRole" type="bean"/>
+          <Connection component="ComboBoxRolePegawai" type="bean"/>
         </Property>
       </Properties>
       <AuxValues>
@@ -201,7 +201,6 @@
           </Properties>
           <Events>
             <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="TabelPegawaiMouseClicked"/>
-            <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="TabelPegawaiKeyPressed"/>
           </Events>
         </Component>
       </SubComponents>
@@ -287,20 +286,20 @@
         <Property name="text" type="java.lang.String" value="Confirm Password"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JTextField" name="txt_iduser">
+    <Component class="javax.swing.JTextField" name="FieldInputIdPegawai">
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txt_iduserActionPerformed"/>
-        <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="txt_iduserKeyPressed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="FieldInputIdPegawaiActionPerformed"/>
+        <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="FieldInputIdPegawaiKeyPressed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JTextField" name="txt_name">
+    <Component class="javax.swing.JTextField" name="FieldInputNamaPegawai">
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txt_nameActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="FieldInputNamaPegawaiActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JTextField" name="txt_pass">
+    <Component class="javax.swing.JTextField" name="FieldInputPassword">
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txt_passActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="FieldInputPasswordActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>

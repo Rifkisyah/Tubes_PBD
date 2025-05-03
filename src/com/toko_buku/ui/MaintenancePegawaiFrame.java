@@ -18,7 +18,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JTable;
 
 /**
  *
@@ -60,13 +59,13 @@ public class MaintenancePegawaiFrame extends javax.swing.JFrame {
     
     private void aturKolom(){
         TableColumn column;
-        TabelPegawai.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        TabelPegawai.setAutoResizeMode(TabelPegawai.AUTO_RESIZE_OFF);
         column = TabelPegawai.getColumnModel().getColumn(0);
         column.setPreferredWidth(100);
         column = TabelPegawai.getColumnModel().getColumn(1);
         column.setPreferredWidth(200);
         column = TabelPegawai.getColumnModel().getColumn(2);
-        column.setPreferredWidth(300);
+        column.setPreferredWidth(200);
         column = TabelPegawai.getColumnModel().getColumn(3);
         column.setPreferredWidth(100);
         column = TabelPegawai.getColumnModel().getColumn(4);
@@ -80,7 +79,7 @@ public class MaintenancePegawaiFrame extends javax.swing.JFrame {
     private void dataToTable(){
         tb = new DefaultTableModel();
         tb.addColumn("Id Pegawai");
-        tb.addColumn("Nama Pegawair");
+        tb.addColumn("Nama Pegawai");
         tb.addColumn("Password");
         tb.addColumn("Role Id");
         tb.addColumn("Nama Role");
@@ -114,15 +113,12 @@ public class MaintenancePegawaiFrame extends javax.swing.JFrame {
             this.pst = this.conn.prepareStatement(query);
             this.res = this.pst.executeQuery();
             
-            JComboRole.removeAllItems();
+            ComboBoxRolePegawai.removeAllItems();
             
             while(this.res.next()){
-                JComboRole.addItem(this.res.getString("Nama_Role"));
+                ComboBoxRolePegawai.addItem(this.res.getString("Nama_Role"));
             }
             
-//            this.res.last();
-//            int jumlahData = this.res.getRow();
-//            this.res.first();
         } catch (SQLException e) {
             e.printStackTrace();
             System.err.println("data ke kombo box gagal");
@@ -130,32 +126,32 @@ public class MaintenancePegawaiFrame extends javax.swing.JFrame {
     }
     
     private void membersihkanTextField(){
-        txt_iduser.setText("");
-        txt_name.setText("");
-        txt_pass.setText("");
-        txt_confPass.setText("");
-        txt_iduser.requestFocus();
+        FieldInputIdPegawai.setText("");
+        FieldInputNamaPegawai.setText("");
+        FieldInputPassword.setText("");
+        FieldInputConfirmPassword.setText("");
+        FieldInputIdPegawai.requestFocus();
     }
     
     private void cekDataUser(){
         try {
-            if(txt_iduser.getText().length() != 8){
+            if(FieldInputIdPegawai.getText().length() != 8){
                 JOptionPane.showMessageDialog(null, "Panjang Karakter tidak boleh lebih dari 3 digit");
-                txt_iduser.requestFocus();
+                FieldInputIdPegawai.requestFocus();
             } else {
-                String query = "SELECT *FROM T_AkunPegawai WHERE Id_Pegawai=" + txt_iduser.getText() + "";
+                String query = "SELECT *FROM T_AkunPegawai WHERE Id_Pegawai=" + FieldInputIdPegawai.getText() + "";
                 ResultSet result = this.stat.executeQuery(query);
                 if(result.next()){
-                    txt_name.setText(result.getString("Nama_Pegawai"));
-                    txt_pass.setText(result.getString("password"));
-                    txt_confPass.setText(result.getString("password"));
-                    txt_name.requestFocus();
+                    FieldInputNamaPegawai.setText(result.getString("Nama_Pegawai"));
+                    FieldInputPassword.setText(result.getString("password"));
+                    FieldInputConfirmPassword.setText(result.getString("password"));
+                    FieldInputNamaPegawai.requestFocus();
                 } else {
                     JOptionPane.showMessageDialog(null, "Id Pegawai Tidak Ditemukan");
-                    txt_name.setText("");
-                    txt_pass.setText("");
-                    txt_confPass.setText("");
-                    txt_name.requestFocus();
+                    FieldInputNamaPegawai.setText("");
+                    FieldInputPassword.setText("");
+                    FieldInputConfirmPassword.setText("");
+                    FieldInputNamaPegawai.requestFocus();
                 }
             }
         } catch (SQLException e){
@@ -164,18 +160,18 @@ public class MaintenancePegawaiFrame extends javax.swing.JFrame {
     }
     
     private void cekValidasiPassword(){
-        String pass = txt_pass.getText();
-        String konfPass = txt_confPass.getText();
+        String pass = FieldInputPassword.getText();
+        String konfPass = FieldInputConfirmPassword.getText();
         if(pass.equals(konfPass)){
-            JComboRole.requestFocus();
+            ComboBoxRolePegawai.requestFocus();
         } else {
             JOptionPane.showMessageDialog(null, "validasi password salah!", "Pesan", JOptionPane.ERROR_MESSAGE);
-            txt_confPass.requestFocus();
+            FieldInputConfirmPassword.requestFocus();
         }
     }
     
     private void cekRoleId(){
-        String roleid = JComboRole.getSelectedItem().toString();
+        String roleid = ComboBoxRolePegawai.getSelectedItem().toString();
         
         try {
             String query = "SELECT * FROM T_Role WHERE Nama_Role='" + roleid +"'";
@@ -185,7 +181,7 @@ public class MaintenancePegawaiFrame extends javax.swing.JFrame {
             } else {
                 this.role_id = "0";
             }
-            insertPegawai();
+            insertUpdate();
         } catch (SQLException e){
             JOptionPane.showMessageDialog(this, "Cek Role id Gagal\n" + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             System.err.println("selected role :" + roleid);
@@ -193,55 +189,92 @@ public class MaintenancePegawaiFrame extends javax.swing.JFrame {
         }
     }
     
-    private void insertPegawai(){
+    private void insertUpdate(){
         try {
             Date tanggal = new Date();
             SimpleDateFormat setTanggal = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String tglSekarang =  setTanggal.format(tanggal);
-            
-            String queryInsert = "INSERT INTO T_AkunPegawai (Id_Pegawai, Nama_Pegawai, password, Id_Role, Tanggal_Buat_Akun) VALUES (?, ?, ?, ?, ?)";
-            PreparedStatement ps = conn.prepareStatement(queryInsert);
-            ps.setString(1, txt_iduser.getText());
-            ps.setString(2, txt_name.getText());
-            ps.setString(3, txt_pass.getText());
-            ps.setString(4, this.role_id);
-            ps.setString(5, tglSekarang);
-            ps.executeUpdate();
+
+            String idPegawai = FieldInputIdPegawai.getText().trim();
+            String namaPegawai = FieldInputNamaPegawai.getText().trim();
+            String password = FieldInputPassword.getText().trim();
+
+            // Cek apakah ID Pegawai sudah ada
+            String cekQuery = "SELECT COUNT(*) FROM T_AkunPegawai WHERE Id_Pegawai = ?";
+            PreparedStatement cekStmt = conn.prepareStatement(cekQuery);
+            cekStmt.setString(1, idPegawai);
+            ResultSet rs = cekStmt.executeQuery();
+            rs.next();
+            int count = rs.getInt(1);
+
+            if (count > 0) {
+                // Jika sudah ada, lakukan update
+                String updateQuery = "UPDATE T_AkunPegawai SET Nama_Pegawai = ?, password = ?, Id_Role = ?, Tanggal_Buat_Akun = ? WHERE Id_Pegawai = ?";
+                PreparedStatement ps = conn.prepareStatement(updateQuery);
+                ps.setString(1, namaPegawai);
+                ps.setString(2, password);
+                ps.setString(3, this.role_id);
+                ps.setString(4, tglSekarang);
+                ps.setString(5, idPegawai);
+
+                ps.executeUpdate();
+                JOptionPane.showMessageDialog(null, "Data Berhasil Diperbarui", "update", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                // Jika belum ada, lakukan insert
+                String queryInsert = "INSERT INTO T_AkunPegawai (Id_Pegawai, Nama_Pegawai, password, Id_Role, Tanggal_Buat_Akun) VALUES (?, ?, ?, ?, ?)";
+                PreparedStatement ps = conn.prepareStatement(queryInsert);
+                ps.setString(1, idPegawai);
+                ps.setString(2, namaPegawai);
+                ps.setString(3, password);
+                ps.setString(4, this.role_id);
+                ps.setString(5, tglSekarang);
+
+                ps.executeUpdate();
+                JOptionPane.showMessageDialog(null, "Data Berhasil Disimpan", "insert", JOptionPane.INFORMATION_MESSAGE);
+            }
+
             dataToTable();
             membersihkanTextField();
-            JOptionPane.showMessageDialog(null, "Data Berhasil Disimpan", "insert", JOptionPane.INFORMATION_MESSAGE);
         } catch (SQLException ex) {
             Logger.getLogger(MaintenancePegawaiFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+
     
-    private void hapusData(){
-        if(JOptionPane.showConfirmDialog(null, "Apakah Yakin Akan Dihapus?", "informasi", JOptionPane.INFORMATION_MESSAGE) == JOptionPane.OK_OPTION){
+    private void hapusData() {
+        if (JOptionPane.showConfirmDialog(null, "Apakah Yakin Akan Dihapus?", "Informasi", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
             try {
-                Statement statDel = this.conn.createStatement();
-                statDel.executeUpdate("DELETE FROM T_AkunPegawai WHERE Id_Pegawai=" + txt_iduser.getText());
-                
-                JOptionPane.showMessageDialog(this, "Data Berhasil Dihapus", "Success", JOptionPane.INFORMATION_MESSAGE);
-                membersihkanTextField();
-                dataToTable();
-            } catch (SQLException e){
+                String query = "DELETE FROM T_AkunPegawai WHERE Id_Pegawai = ?";
+                PreparedStatement stmt = conn.prepareStatement(query);
+                stmt.setString(1, FieldInputIdPegawai.getText().trim());
+
+                int result = stmt.executeUpdate();
+                if (result > 0) {
+                    membersihkanTextField();
+                    dataToTable();
+                    JOptionPane.showMessageDialog(this, "Data Berhasil Dihapus", "Success", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(this, "Data Tidak Ditemukan / Gagal Dihapus", "Info", JOptionPane.WARNING_MESSAGE);
+                }
+            } catch (SQLException e) {
                 JOptionPane.showMessageDialog(this, "Hapus Data Gagal\n" + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         } else {
             JOptionPane.showMessageDialog(null, "Pegawai Batal Dihapus");
-            txt_iduser.requestFocus();
+            FieldInputIdPegawai.requestFocus();
         }
     }
+
     
-//    private boolean isRoleExists(String roleId) throws SQLException {
-//        String query = "SELECT 1 FROM T_Role WHERE Id_Role = ?";
-//        try (PreparedStatement stmt = conn.prepareStatement(query)) {
-//            stmt.setString(1, roleId);
-//            try (ResultSet rs = stmt.executeQuery()) {
-//                return rs.next();
-//            }
-//        }
-//    }
+    private boolean isRoleExists(String roleId) throws SQLException {
+        String query = "SELECT 1 FROM T_Role WHERE Id_Role = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, roleId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
 
 
     /**
@@ -253,8 +286,8 @@ public class MaintenancePegawaiFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        txt_confPass = new javax.swing.JTextField();
-        JComboRole = new javax.swing.JComboBox<>();
+        FieldInputConfirmPassword = new javax.swing.JTextField();
+        ComboBoxRolePegawai = new javax.swing.JComboBox<>();
         jScrollPane1 = new javax.swing.JScrollPane();
         TabelPegawai = new javax.swing.JTable();
         btn_simpan = new javax.swing.JButton();
@@ -266,20 +299,20 @@ public class MaintenancePegawaiFrame extends javax.swing.JFrame {
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
-        txt_iduser = new javax.swing.JTextField();
-        txt_name = new javax.swing.JTextField();
-        txt_pass = new javax.swing.JTextField();
+        FieldInputIdPegawai = new javax.swing.JTextField();
+        FieldInputNamaPegawai = new javax.swing.JTextField();
+        FieldInputPassword = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        txt_confPass.addActionListener(new java.awt.event.ActionListener() {
+        FieldInputConfirmPassword.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txt_confPassActionPerformed(evt);
+                FieldInputConfirmPasswordActionPerformed(evt);
             }
         });
 
-        JComboRole.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        JComboRole.setSelectedItem(JComboRole);
+        ComboBoxRolePegawai.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        ComboBoxRolePegawai.setSelectedItem(ComboBoxRolePegawai);
 
         TabelPegawai.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -295,11 +328,6 @@ public class MaintenancePegawaiFrame extends javax.swing.JFrame {
         TabelPegawai.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 TabelPegawaiMouseClicked(evt);
-            }
-        });
-        TabelPegawai.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                TabelPegawaiKeyPressed(evt);
             }
         });
         jScrollPane1.setViewportView(TabelPegawai);
@@ -346,26 +374,26 @@ public class MaintenancePegawaiFrame extends javax.swing.JFrame {
         jLabel6.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel6.setText("Confirm Password");
 
-        txt_iduser.addActionListener(new java.awt.event.ActionListener() {
+        FieldInputIdPegawai.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txt_iduserActionPerformed(evt);
+                FieldInputIdPegawaiActionPerformed(evt);
             }
         });
-        txt_iduser.addKeyListener(new java.awt.event.KeyAdapter() {
+        FieldInputIdPegawai.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
-                txt_iduserKeyPressed(evt);
+                FieldInputIdPegawaiKeyPressed(evt);
             }
         });
 
-        txt_name.addActionListener(new java.awt.event.ActionListener() {
+        FieldInputNamaPegawai.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txt_nameActionPerformed(evt);
+                FieldInputNamaPegawaiActionPerformed(evt);
             }
         });
 
-        txt_pass.addActionListener(new java.awt.event.ActionListener() {
+        FieldInputPassword.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txt_passActionPerformed(evt);
+                FieldInputPasswordActionPerformed(evt);
             }
         });
 
@@ -395,17 +423,17 @@ public class MaintenancePegawaiFrame extends javax.swing.JFrame {
                             .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(23, 23, 23)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(JComboRole, javax.swing.GroupLayout.PREFERRED_SIZE, 187, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(ComboBoxRolePegawai, javax.swing.GroupLayout.PREFERRED_SIZE, 187, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                 .addGroup(layout.createSequentialGroup()
-                                    .addComponent(txt_pass, javax.swing.GroupLayout.DEFAULT_SIZE, 178, Short.MAX_VALUE)
+                                    .addComponent(FieldInputPassword, javax.swing.GroupLayout.DEFAULT_SIZE, 178, Short.MAX_VALUE)
                                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                     .addComponent(jLabel6)
                                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(txt_confPass, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addComponent(txt_name)
+                                    .addComponent(FieldInputConfirmPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(FieldInputNamaPegawai)
                                 .addGroup(layout.createSequentialGroup()
-                                    .addComponent(txt_iduser, javax.swing.GroupLayout.PREFERRED_SIZE, 186, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(FieldInputIdPegawai, javax.swing.GroupLayout.PREFERRED_SIZE, 186, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addGap(0, 0, Short.MAX_VALUE))))))
                 .addContainerGap(43, Short.MAX_VALUE))
         );
@@ -417,22 +445,22 @@ public class MaintenancePegawaiFrame extends javax.swing.JFrame {
                 .addGap(40, 40, 40)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
-                    .addComponent(txt_iduser, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(FieldInputIdPegawai, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
-                    .addComponent(txt_name, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(FieldInputNamaPegawai, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel4)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(txt_pass, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(FieldInputPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jLabel6)
-                        .addComponent(txt_confPass, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(FieldInputConfirmPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(16, 16, 16)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel5)
-                    .addComponent(JComboRole, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(ComboBoxRolePegawai, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 182, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
@@ -446,31 +474,31 @@ public class MaintenancePegawaiFrame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void txt_confPassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_confPassActionPerformed
+    private void FieldInputConfirmPasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_FieldInputConfirmPasswordActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_txt_confPassActionPerformed
+    }//GEN-LAST:event_FieldInputConfirmPasswordActionPerformed
 
-    private void txt_iduserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_iduserActionPerformed
+    private void FieldInputIdPegawaiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_FieldInputIdPegawaiActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_txt_iduserActionPerformed
+    }//GEN-LAST:event_FieldInputIdPegawaiActionPerformed
 
-    private void txt_iduserKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_iduserKeyPressed
+    private void FieldInputIdPegawaiKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_FieldInputIdPegawaiKeyPressed
         if(evt.getKeyCode() == KeyEvent.VK_ENTER || evt.getKeyCode() == KeyEvent.VK_TAB){
 //            txt_name.requestFocus();
             cekValidasiPassword();
         }
-    }//GEN-LAST:event_txt_iduserKeyPressed
+    }//GEN-LAST:event_FieldInputIdPegawaiKeyPressed
 
-    private void txt_nameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_nameActionPerformed
+    private void FieldInputNamaPegawaiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_FieldInputNamaPegawaiActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_txt_nameActionPerformed
+    }//GEN-LAST:event_FieldInputNamaPegawaiActionPerformed
 
-    private void txt_passActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_passActionPerformed
+    private void FieldInputPasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_FieldInputPasswordActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_txt_passActionPerformed
+    }//GEN-LAST:event_FieldInputPasswordActionPerformed
 
     private void btn_keluarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_keluarActionPerformed
-        if(JOptionPane.showConfirmDialog(null, "Are You Sure You Want To Quit?") == JOptionPane.YES_OPTION){
+        if(JOptionPane.showConfirmDialog(null, "Apakah Kamu Yakin Ingin Keluar Dari Maintenance Pegawai?") == JOptionPane.YES_OPTION){
             this.setVisible(false);
             adminFrame.setEnabled(true);
             adminFrame.requestFocus();
@@ -478,50 +506,55 @@ public class MaintenancePegawaiFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_btn_keluarActionPerformed
 
     private void btn_simpanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_simpanActionPerformed
-        String kodeUser = txt_iduser.getText();
-        String namaUser = txt_name.getText();
-        String pass = txt_pass.getText();
-        String konfPass = txt_confPass.getText();
-        String role_id = JComboRole.getSelectedItem().toString();
-        String roleid;
+        String kodeUser = FieldInputIdPegawai.getText();
+        String namaUser = FieldInputNamaPegawai.getText();
+        String pass = FieldInputPassword.getText();
+        String konfPass = FieldInputConfirmPassword.getText();
         
         if(namaUser.isEmpty() && kodeUser.isEmpty() && pass.isEmpty() && konfPass.isEmpty()){
             JOptionPane.showMessageDialog(null, "Terdapat Data Yangg Masih Kosong!");
-            txt_iduser.requestFocus();
+            FieldInputIdPegawai.requestFocus();
         } else {
             if(kodeUser.length() >= 6){
                 if(pass.equals(konfPass)){
                     cekRoleId();
                 } else {
                     JOptionPane.showMessageDialog(null, "Password Tidak Sama!", "Pesan", JOptionPane.ERROR_MESSAGE);
-                    txt_confPass.requestFocus();
+                    FieldInputConfirmPassword.requestFocus();
                 }
             } else {
                 JOptionPane.showMessageDialog(null, "Panjang Karakter ID Harus 8 Digit");
-                txt_iduser.requestFocus();
+                FieldInputIdPegawai.requestFocus();
             }
 
         } 
     }//GEN-LAST:event_btn_simpanActionPerformed
 
     private void btn_hapusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_hapusActionPerformed
-        if(txt_iduser.getText().isEmpty()){
+        if(FieldInputIdPegawai.getText().isEmpty()){
             JOptionPane.showMessageDialog(null, "Id Tidak Boleh Kosong");
-            txt_iduser.requestFocus();
+            FieldInputIdPegawai.requestFocus();
         } else {
             hapusData();
         }
     }//GEN-LAST:event_btn_hapusActionPerformed
 
-    private void TabelPegawaiKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TabelPegawaiKeyPressed
-
-    }//GEN-LAST:event_TabelPegawaiKeyPressed
-
     private void TabelPegawaiMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TabelPegawaiMouseClicked
-//        txt_iduser.setText(tb.getValueAt(TabelPegawai.getSelectedRow(), 0) + "");
-//        txt_name.setText(tb.getValueAt(TabelPegawai.getSelectedRow(), 1) + "");
-//        txt_pass.setText(tb.getValueAt(TabelPegawai.getSelectedRow(), 2) + "");
-//        txt_confPass.setText(tb.getValueAt(TabelPegawai.getSelectedRow(), 2) + "");
+        FieldInputIdPegawai.setText(tb.getValueAt(TabelPegawai.getSelectedRow(), 0) + "");
+        FieldInputNamaPegawai.setText(tb.getValueAt(TabelPegawai.getSelectedRow(), 1) + "");
+        FieldInputPassword.setText(tb.getValueAt(TabelPegawai.getSelectedRow(), 2) + "");
+        FieldInputConfirmPassword.setText(tb.getValueAt(TabelPegawai.getSelectedRow(), 2) + "");
+        
+        String selectedRole = tb.getValueAt(TabelPegawai.getSelectedRow(), 3).toString().trim();
+
+        // Loop ke item JComboBox untuk mencari dan set sesuai value
+        for (int i = 0; i < ComboBoxRolePegawai.getItemCount(); i++) {
+            String item = tb.getValueAt(TabelPegawai.getSelectedRow(), 3).toString().trim();
+            if (item.equalsIgnoreCase(selectedRole)) {
+                ComboBoxRolePegawai.setSelectedIndex(i);
+                break;
+            }
+        }
     }//GEN-LAST:event_TabelPegawaiMouseClicked
 
     /**
@@ -529,7 +562,11 @@ public class MaintenancePegawaiFrame extends javax.swing.JFrame {
      */
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox<String> JComboRole;
+    private javax.swing.JComboBox<String> ComboBoxRolePegawai;
+    private javax.swing.JTextField FieldInputConfirmPassword;
+    private javax.swing.JTextField FieldInputIdPegawai;
+    private javax.swing.JTextField FieldInputNamaPegawai;
+    private javax.swing.JTextField FieldInputPassword;
     private javax.swing.JTable TabelPegawai;
     private javax.swing.JButton btn_hapus;
     private javax.swing.JButton btn_keluar;
@@ -541,9 +578,5 @@ public class MaintenancePegawaiFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextField txt_confPass;
-    private javax.swing.JTextField txt_iduser;
-    private javax.swing.JTextField txt_name;
-    private javax.swing.JTextField txt_pass;
     // End of variables declaration//GEN-END:variables
 }

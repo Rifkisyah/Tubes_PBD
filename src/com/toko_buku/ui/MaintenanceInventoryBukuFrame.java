@@ -377,7 +377,7 @@ public class MaintenanceInventoryBukuFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btn_keluarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_keluarActionPerformed
-        if(JOptionPane.showConfirmDialog(null, "Apakah Kamu Yakin Ingin Keluar?") == JOptionPane.YES_OPTION){
+        if(JOptionPane.showConfirmDialog(null, "Apakah Kamu Yakin Ingin Keluar Dari Maintenance Inventory?") == JOptionPane.YES_OPTION){
             this.setVisible(false);
             inventoryFrame.setEnabled(true);
             inventoryFrame.requestFocus();

@@ -4,11 +4,14 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/D:/User/Documents/kuliah/semester4/pemrograman_desktop/project/toko_buku/UAS_pemrogramanDesktop_tubes/src/com/toko_buku/ui/InventoryFrame.java</file>
+            <file>file:/D:/User/Documents/kuliah/semester4/pemrograman_desktop/project/toko_buku/UAS_pemrogramanDesktop_tubes/src/com/toko_buku/ui/VendorFrame.java</file>
             <file>file:/D:/User/Documents/kuliah/semester4/pemrograman_desktop/project/toko_buku/UAS_pemrogramanDesktop_tubes/src/com/toko_buku/data/Pegawai.java</file>
             <file>file:/D:/User/Documents/kuliah/semester4/pemrograman_desktop/project/toko_buku/UAS_pemrogramanDesktop_tubes/src/com/toko_buku/ui/CashierFrame.java</file>
             <file>file:/D:/User/Documents/kuliah/semester4/pemrograman_desktop/project/toko_buku/UAS_pemrogramanDesktop_tubes/src/com/toko_buku/ui/SuperAdminFrame.java</file>
             <file>file:/D:/User/Documents/kuliah/semester4/pemrograman_desktop/project/toko_buku/UAS_pemrogramanDesktop_tubes/src/com/toko_buku/ui/MaintenanceInventoryBukuFrame.java</file>
             <file>file:/D:/User/Documents/kuliah/semester4/pemrograman_desktop/project/toko_buku/UAS_pemrogramanDesktop_tubes/src/com/toko_buku/ui/LoginFrame.java</file>
+            <file>file:/D:/User/Documents/kuliah/semester4/pemrograman_desktop/project/toko_buku/UAS_pemrogramanDesktop_tubes/src/com/toko_buku/ui/MaintenancePegawaiFrame.java</file>
+            <file>file:/D:/User/Documents/kuliah/semester4/pemrograman_desktop/project/toko_buku/UAS_pemrogramanDesktop_tubes/src/com/toko_buku/ui/RoleFrame.java</file>
         </group>
     </open-files>
 </project-private>
