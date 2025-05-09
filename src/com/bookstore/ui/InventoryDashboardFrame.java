@@ -5,6 +5,8 @@
 package com.bookstore.ui;
 
 import com.bookstore.ui.menu.ChangePassword;
+import com.bookstore.ui.menu.DaftarPO;
+import com.bookstore.ui.menu.POManagement;
 import com.bookstore.ui.menu.RackConfig;
 import com.bookstore.ui.menu.StockBook;
 import javax.swing.JOptionPane;
@@ -44,7 +46,8 @@ public class InventoryDashboardFrame extends javax.swing.JFrame {
         DaftarStockBuku = new javax.swing.JMenuItem();
         RackConfig = new javax.swing.JMenuItem();
         jMenu3 = new javax.swing.JMenu();
-        jMenuItem6 = new javax.swing.JMenuItem();
+        CreatePOMenu = new javax.swing.JMenuItem();
+        CheckPOMenu = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
         jMenuItem8 = new javax.swing.JMenuItem();
         jMenu5 = new javax.swing.JMenu();
@@ -53,7 +56,7 @@ public class InventoryDashboardFrame extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setPreferredSize(new java.awt.Dimension(1200, 600));
 
-        jLabel1.setIcon(new javax.swing.ImageIcon("D:\\User\\Documents\\kuliah\\semester4\\pemrograman_desktop\\project\\toko_buku\\UAS_pemrogramanDesktop_tubes\\assets\\images\\dashboard-inventory-img-scale.jpg")); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon("D:\\User\\Documents\\kuliah\\semester4\\pemrograman_desktop\\project\\toko_buku\\Fix_Tubes\\assets\\images\\dashboard-inventory-img-scale.jpg")); // NOI18N
 
         jMenu1.setText("File");
 
@@ -97,8 +100,21 @@ public class InventoryDashboardFrame extends javax.swing.JFrame {
 
         jMenu3.setText("Purchase Order");
 
-        jMenuItem6.setText("Manajemen PO");
-        jMenu3.add(jMenuItem6);
+        CreatePOMenu.setText("Buat PO");
+        CreatePOMenu.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                CreatePOMenuActionPerformed(evt);
+            }
+        });
+        jMenu3.add(CreatePOMenu);
+
+        CheckPOMenu.setText("Daftar PO");
+        CheckPOMenu.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                CheckPOMenuActionPerformed(evt);
+            }
+        });
+        jMenu3.add(CheckPOMenu);
 
         jMenuBar1.add(jMenu3);
 
@@ -150,7 +166,6 @@ public class InventoryDashboardFrame extends javax.swing.JFrame {
 
     private void ChangePasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ChangePasswordActionPerformed
         ChangePassword changePassword = new ChangePassword();
-        changePassword.setFocusable(true);
         changePassword.setVisible(true);
     }//GEN-LAST:event_ChangePasswordActionPerformed
 
@@ -158,6 +173,16 @@ public class InventoryDashboardFrame extends javax.swing.JFrame {
         RackConfig rakConfig = new RackConfig();
         rakConfig.setVisible(true);
     }//GEN-LAST:event_RackConfigActionPerformed
+
+    private void CreatePOMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CreatePOMenuActionPerformed
+        POManagement poManagement = new POManagement();
+        poManagement.setVisible(true);
+    }//GEN-LAST:event_CreatePOMenuActionPerformed
+
+    private void CheckPOMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CheckPOMenuActionPerformed
+        DaftarPO daftarPO = new DaftarPO();
+        daftarPO.setVisible(true);
+    }//GEN-LAST:event_CheckPOMenuActionPerformed
 
     /**
      * @param args the command line arguments
@@ -196,6 +221,8 @@ public class InventoryDashboardFrame extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem ChangePassword;
+    private javax.swing.JMenuItem CheckPOMenu;
+    private javax.swing.JMenuItem CreatePOMenu;
     private javax.swing.JMenuItem DaftarStockBuku;
     private javax.swing.JMenuItem Exit;
     private javax.swing.JMenuItem RackConfig;
@@ -206,7 +233,6 @@ public class InventoryDashboardFrame extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu4;
     private javax.swing.JMenu jMenu5;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem6;
     private javax.swing.JMenuItem jMenuItem8;
     private javax.swing.JMenuItem jMenuItem9;
     // End of variables declaration//GEN-END:variables

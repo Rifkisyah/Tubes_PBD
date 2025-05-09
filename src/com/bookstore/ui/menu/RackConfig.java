@@ -12,6 +12,8 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import java.sql.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 /**
  *
@@ -24,6 +26,10 @@ public class RackConfig extends javax.swing.JFrame {
     ResultSet rslt;
     private int countData;
     private String queryCheck, queryInsert, queryUpdate, queryDelete;
+    private String selectedRackCode = "";
+    private String selectedRackName = "";
+    private String selectedRackLocation = "";
+
     /**
      * Creates new form RakConfig
      */
@@ -35,6 +41,34 @@ public class RackConfig extends javax.swing.JFrame {
         this.setLocationRelativeTo(null);
 
         setHeaderTable();
+        
+        DocumentListener fieldChangeListener = new DocumentListener() {
+            private void updateButtonLabel() {
+                String code = rack_code.getText().trim();
+                String name = rack_name.getText().trim();
+                String location = rack_location.getText().trim();
+
+                if (!code.equals(selectedRackCode) || !name.equals(selectedRackName) || !location.equals(selectedRackLocation)) {
+                    AddNewRackButton1.setText("Tambahkan Rak");
+                } else {
+                    AddNewRackButton1.setText("Update Rak");
+                }
+            }
+
+            @Override
+            public void insertUpdate(DocumentEvent e) { updateButtonLabel(); }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) { updateButtonLabel(); }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) { updateButtonLabel(); }
+        };
+
+        rack_code.getDocument().addDocumentListener(fieldChangeListener);
+        rack_name.getDocument().addDocumentListener(fieldChangeListener);
+        rack_location.getDocument().addDocumentListener(fieldChangeListener);
+
     }
     
     private void columnSizing(){
@@ -82,7 +116,22 @@ public class RackConfig extends javax.swing.JFrame {
         getDataTable();
     }
     
-    
+    private void resetFormAndRefreshTable() {
+        rack_code.setText("");
+        rack_name.setText("");
+        rack_location.setText("");
+        AddNewRackButton1.setText("Tambahkan Rak");
+
+        tableModel.getDataVector().removeAllElements();
+        tableModel.fireTableDataChanged();
+        getDataTable();
+
+        // Reset selected data
+        selectedRackCode = "";
+        selectedRackName = "";
+        selectedRackLocation = "";
+    }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -191,7 +240,7 @@ public class RackConfig extends javax.swing.JFrame {
         AddNewRackButton1.setBackground(new java.awt.Color(0, 204, 0));
         AddNewRackButton1.setFont(new java.awt.Font("Ebrima", 1, 14)); // NOI18N
         AddNewRackButton1.setForeground(new java.awt.Color(255, 255, 255));
-        AddNewRackButton1.setText("Tambahkan");
+        AddNewRackButton1.setText("Tambahkan Rak");
         AddNewRackButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 AddNewRackButton1ActionPerformed(evt);
@@ -214,18 +263,18 @@ public class RackConfig extends javax.swing.JFrame {
                             .addComponent(jLabel3))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(rack_location)
+                            .addComponent(rack_location, javax.swing.GroupLayout.DEFAULT_SIZE, 377, Short.MAX_VALUE)
                             .addComponent(rack_name)
                             .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGap(177, 177, 177)
+                                .addGap(116, 116, 116)
                                 .addComponent(AddNewRackButton1)
                                 .addGap(18, 18, 18)
-                                .addComponent(DeleteSelectedRackButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addComponent(DeleteSelectedRackButton))
                             .addComponent(rack_code)))
                     .addComponent(CloseButton, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 465, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1)
                     .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 462, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(12, Short.MAX_VALUE))
+                .addContainerGap(15, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -337,48 +386,64 @@ public class RackConfig extends javax.swing.JFrame {
         String code = rack_code.getText().trim();
         String name = rack_name.getText().trim();
         String location = rack_location.getText().trim();
-        
+
         if(code.equals("")){
             JOptionPane.showMessageDialog(this, "Kode rak Masih Kosong!", "Terjadi Masalah", JOptionPane.ERROR_MESSAGE);
+            return;
         } else if(name.equals("")){
-            JOptionPane.showMessageDialog(this, "nama rak Masih Kosong!", "Terjadi Masalah", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Nama rak Masih Kosong!", "Terjadi Masalah", JOptionPane.ERROR_MESSAGE);
+            return;
         } else if(location.equals("")){
-            JOptionPane.showMessageDialog(this, "lokasi rak Masih Kosong!", "Terjadi Masalah", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Lokasi rak Masih Kosong!", "Terjadi Masalah", JOptionPane.ERROR_MESSAGE);
+            return;
         }
-        
-        try{
+
+        try {
             this.queryCheck = "SELECT COUNT(*) FROM T_Rak WHERE kode_rak = ?";
             this.stmt = mysqlConnection.getConnection().prepareStatement(queryCheck);
             stmt.setString(1, code);
             this.rslt = stmt.executeQuery();
             rslt.next();
             this.countData = rslt.getInt(1);
-            
-            if(countData > 0){
-                JOptionPane.showMessageDialog(this, "Rak Sudah Ada! Tidak Bisa Melakukan Perubahan!", "Terjadi Masalah", JOptionPane.ERROR_MESSAGE);
-            } else {
-                this.queryInsert = "INSERT INTO T_Rak (kode_rak, nama_rak, lokasi_rak) values(?, ?, ?)";
+
+            if(AddNewRackButton1.getText().equals("Update Rak")) {
+                // Mode Update
+                this.queryInsert = "UPDATE T_Rak SET nama_rak = ?, lokasi_rak = ? WHERE kode_rak = ?";
                 this.stmt = mysqlConnection.getConnection().prepareStatement(queryInsert);
-                stmt.setString(1, code);
-                stmt.setString(2, name);
-                stmt.setString(3, location);
+                stmt.setString(1, name);
+                stmt.setString(2, location);
+                stmt.setString(3, code);
                 this.countData = stmt.executeUpdate();
-                
+
                 if(countData > 0){
-                    tableModel.getDataVector().removeAllElements();
-                    tableModel.fireTableDataChanged();
-                
-                    rack_code.setText("");
-                    rack_name.setText("");
-                    rack_location.setText("");
-                    getDataTable();
-                    JOptionPane.showMessageDialog(this, "Rak Berhasil Ditambahkan", "Berhasil Menambahkan Rak Baru", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Data Rak Berhasil Diperbarui", "Berhasil", JOptionPane.INFORMATION_MESSAGE);
+                    resetFormAndRefreshTable();
                 } else {
-                    JOptionPane.showMessageDialog(this, "Rak Sudah Ada!", "Gagal Menambahkan Rak Baru", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Gagal Memperbarui Rak", "Gagal", JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
+                // Mode Tambah Baru
+                if(countData > 0){
+                    JOptionPane.showMessageDialog(this, "Rak Sudah Ada! Tidak Bisa Menambahkan Duplikat.", "Terjadi Masalah", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    this.queryInsert = "INSERT INTO T_Rak (kode_rak, nama_rak, lokasi_rak) values(?, ?, ?)";
+                    this.stmt = mysqlConnection.getConnection().prepareStatement(queryInsert);
+                    stmt.setString(1, code);
+                    stmt.setString(2, name);
+                    stmt.setString(3, location);
+                    this.countData = stmt.executeUpdate();
+
+                    if(countData > 0){
+                        JOptionPane.showMessageDialog(this, "Rak Berhasil Ditambahkan", "Berhasil", JOptionPane.INFORMATION_MESSAGE);
+                        resetFormAndRefreshTable();
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Gagal Menambahkan Rak Baru", "Gagal", JOptionPane.ERROR_MESSAGE);
+                    }
                 }
             }
         } catch (SQLException | ClassNotFoundException ex){
             ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Terjadi Kesalahan Database", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_AddNewRackButton1ActionPerformed
 
@@ -387,43 +452,23 @@ public class RackConfig extends javax.swing.JFrame {
         rack_name.setText(tableModel.getValueAt(RackTable.getSelectedRow(), 1) + "");
         rack_location.setText(tableModel.getValueAt(RackTable.getSelectedRow(), 2) + "");
 
+        int row = RackTable.getSelectedRow();
+        if (row >= 0) {
+            selectedRackCode = tableModel.getValueAt(row, 0).toString();
+            selectedRackName = tableModel.getValueAt(row, 1).toString();
+            selectedRackLocation = tableModel.getValueAt(row, 2).toString();
+
+            rack_code.setText(selectedRackCode);
+            rack_name.setText(selectedRackName);
+            rack_location.setText(selectedRackLocation);
+
+            AddNewRackButton1.setText("Update Rak");
+        }
     }//GEN-LAST:event_RackTableMouseClicked
 
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(RackConfig.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(RackConfig.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(RackConfig.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(RackConfig.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new RackConfig().setVisible(true);
-            }
-        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton AddNewRackButton1;

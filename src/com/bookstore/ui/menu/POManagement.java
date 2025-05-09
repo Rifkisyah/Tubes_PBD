@@ -4,10 +4,15 @@
  */
 package com.bookstore.ui.menu;
 
+import com.bookstore.data.EmployeeAccount;
 import com.bookstore.data.MysqlConnection;
+import com.bookstore.data.SessionAccount;
+import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.NumberFormat;
+import java.time.LocalDate;
 import javax.swing.JOptionPane;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -29,7 +34,11 @@ public class POManagement extends javax.swing.JFrame {
      * Creates new form POManagement
      */
     public POManagement() {
+        this.setUndecorated(true);
+        this.setAlwaysOnTop(true);
+        
         initComponents();
+        this.setLocationRelativeTo(null);
         
         setHeaderTable();
         dataVendorComboBox();
@@ -184,6 +193,47 @@ public class POManagement extends javax.swing.JFrame {
             ex.printStackTrace();
         }
     }
+    
+    private String generateNotaPO() {
+        return "PO" + System.currentTimeMillis(); 
+    }
+    
+    private void insertPurchaseOrder(String isbn, String idVendor, int jumlahPO, BigDecimal hargaSatuan) {
+        try {
+            mysqlConnection = new MysqlConnection();
+            EmployeeAccount employeeAccount = SessionAccount.getSessionAccount();
+
+            String idPegawai = employeeAccount.getId();
+            String notaPO = generateNotaPO();
+            LocalDate tanggalPO = LocalDate.now();
+            LocalDate estimasiDatang = tanggalPO.plusDays(7);
+            BigDecimal totalBiaya = hargaSatuan.multiply(BigDecimal.valueOf(jumlahPO));
+            String statusPO = "Diproses";
+
+            String queryInsert = "INSERT INTO t_purchaseorder (nota_PO, id_pegawai, id_vendor, isbn, tanggal_po, estimasi_tanggal_datang, jumlah_po, total_biaya, status_po) " +
+                                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+            PreparedStatement insertStmt = mysqlConnection.getConnection().prepareStatement(queryInsert);
+            insertStmt.setString(1, notaPO);
+            insertStmt.setString(2, idPegawai);
+            insertStmt.setString(3, idVendor);
+            insertStmt.setString(4, isbn);
+            insertStmt.setDate(5, java.sql.Date.valueOf(tanggalPO));
+            insertStmt.setDate(6, java.sql.Date.valueOf(estimasiDatang));
+            insertStmt.setInt(7, jumlahPO);
+            insertStmt.setBigDecimal(8, totalBiaya);
+            insertStmt.setString(9, statusPO);
+
+            insertStmt.executeUpdate();
+            JOptionPane.showMessageDialog(this, "PO berhasil dibuat dengan Nota: " + notaPO, "Sukses", JOptionPane.INFORMATION_MESSAGE);
+
+        } catch (SQLException | ClassNotFoundException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Gagal membuat PO!", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -218,7 +268,7 @@ public class POManagement extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jPanel1.setBackground(new java.awt.Color(0, 204, 204));
+        jPanel1.setBackground(new java.awt.Color(102, 102, 255));
         jPanel1.setPreferredSize(new java.awt.Dimension(700, 800));
 
         jLabel4.setFont(new java.awt.Font("Ebrima", 1, 24)); // NOI18N
@@ -279,11 +329,6 @@ public class POManagement extends javax.swing.JFrame {
         isbn_field.setFont(new java.awt.Font("Ebrima", 0, 14)); // NOI18N
 
         book_title_field.setFont(new java.awt.Font("Ebrima", 0, 14)); // NOI18N
-        book_title_field.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                book_title_fieldActionPerformed(evt);
-            }
-        });
 
         jLabel7.setFont(new java.awt.Font("Ebrima", 1, 14)); // NOI18N
         jLabel7.setForeground(new java.awt.Color(255, 255, 255));
@@ -291,11 +336,6 @@ public class POManagement extends javax.swing.JFrame {
         jLabel7.setText("Jumlah Buku");
 
         total_book_field.setFont(new java.awt.Font("Ebrima", 0, 14)); // NOI18N
-        total_book_field.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                total_book_fieldActionPerformed(evt);
-            }
-        });
 
         jLabel8.setFont(new java.awt.Font("Ebrima", 1, 14)); // NOI18N
         jLabel8.setForeground(new java.awt.Color(255, 255, 255));
@@ -303,11 +343,6 @@ public class POManagement extends javax.swing.JFrame {
         jLabel8.setText("Vendor");
 
         vendor_combobox.setFont(new java.awt.Font("Ebrima", 0, 14)); // NOI18N
-        vendor_combobox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                vendor_comboboxActionPerformed(evt);
-            }
-        });
 
         jLabel9.setFont(new java.awt.Font("Ebrima", 1, 14)); // NOI18N
         jLabel9.setForeground(new java.awt.Color(255, 255, 255));
@@ -315,12 +350,9 @@ public class POManagement extends javax.swing.JFrame {
         jLabel9.setText("Harga Satuan");
 
         price_field.setEditable(false);
+        price_field.setBackground(new java.awt.Color(204, 204, 204));
         price_field.setFont(new java.awt.Font("Ebrima", 0, 14)); // NOI18N
-        price_field.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                price_fieldActionPerformed(evt);
-            }
-        });
+        price_field.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
         CreateNewPOButton.setFont(new java.awt.Font("Ebrima", 1, 14)); // NOI18N
         CreateNewPOButton.setText("Buat PO");
@@ -481,20 +513,72 @@ public class POManagement extends javax.swing.JFrame {
     }//GEN-LAST:event_CloseButtonActionPerformed
 
     private void CreateNewPOButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CreateNewPOButtonActionPerformed
-        // TODO add your handling code here:
+        mysqlConnection = new MysqlConnection();
+
+        String isbn = isbn_field.getText().trim();
+        String vendorName = (String) vendor_combobox.getSelectedItem();
+        int jumlahPO;
+        BigDecimal hargaSatuan;
+
+        try {
+            jumlahPO = Integer.parseInt(total_book_field.getText().trim());
+            hargaSatuan = new BigDecimal(price_field.getText().trim());
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Harga atau jumlah PO tidak valid!", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        try {
+            String getIdVendorQuery = "SELECT id_vendor FROM t_detailmasterbuku WHERE nama_vendor = ? LIMIT 1";
+            PreparedStatement vendorStmt = mysqlConnection.getConnection().prepareStatement(getIdVendorQuery);
+            vendorStmt.setString(1, vendorName);
+            ResultSet rs = vendorStmt.executeQuery();
+
+            if (!rs.next()) {
+                JOptionPane.showMessageDialog(this, "Vendor tidak ditemukan!", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            String idVendor = rs.getString("id_vendor");
+
+            // Update stock
+            String stockQuery = "SELECT stock_buku FROM t_detailmasterbuku WHERE isbn = ? AND id_vendor = ?";
+            PreparedStatement stockStmt = mysqlConnection.getConnection().prepareStatement(stockQuery);
+            stockStmt.setString(1, isbn);
+            stockStmt.setString(2, idVendor);
+            ResultSet stockResult = stockStmt.executeQuery();
+
+            if (!stockResult.next()) {
+                JOptionPane.showMessageDialog(this, "Data stok tidak ditemukan!", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            int currentStock = stockResult.getInt("stock_buku");
+            int newStock = currentStock - jumlahPO;
+
+            if (newStock < 0) {
+                JOptionPane.showMessageDialog(this, "Stok tidak mencukupi saat proses update!", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            String updateStockQuery = "UPDATE t_detailmasterbuku SET stock_buku = ?, tanggal_update_stock = NOW() WHERE isbn = ? AND id_vendor = ?";
+            PreparedStatement updateStmt = mysqlConnection.getConnection().prepareStatement(updateStockQuery);
+            updateStmt.setInt(1, newStock);
+            updateStmt.setString(2, isbn);
+            updateStmt.setString(3, idVendor);
+            updateStmt.executeUpdate();
+
+            // Insert PO
+            insertPurchaseOrder(isbn, idVendor, jumlahPO, hargaSatuan);
+
+            CreateNewPOButton.setEnabled(false);
+            CloseButton.setEnabled(true);
+
+        } catch (SQLException | ClassNotFoundException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Terjadi kesalahan saat proses PO!", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_CreateNewPOButtonActionPerformed
-
-    private void vendor_comboboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_vendor_comboboxActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_vendor_comboboxActionPerformed
-
-    private void total_book_fieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_total_book_fieldActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_total_book_fieldActionPerformed
-
-    private void book_title_fieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_book_title_fieldActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_book_title_fieldActionPerformed
 
     private void search_fieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_search_fieldActionPerformed
         String search_value = search_field.getText().trim();
@@ -509,69 +593,87 @@ public class POManagement extends javax.swing.JFrame {
         total_book_field.setText(tableModel.getValueAt(VendorStockBookTable.getSelectedRow(), 7) + "");
     }//GEN-LAST:event_VendorStockBookTableMouseClicked
 
-    private void price_fieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_price_fieldActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_price_fieldActionPerformed
-
     private void CheckAvailableFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CheckAvailableFieldActionPerformed
         mysqlConnection = new MysqlConnection();
+
         String isbn = isbn_field.getText().trim();
         String title = book_title_field.getText().trim();
-        String vendor = (String) vendor_combobox.getSelectedItem();
-        String price = price_field.getText().trim();
-        String totalPo = total_book_field.getText().trim();
-        
-        if(isbn.isEmpty()){
-            JOptionPane.showMessageDialog(this, "ISBN Masih Kosong!", "Terjadi Masalah", JOptionPane.ERROR_MESSAGE);            
-        } else if (title.isEmpty()){
+        String vendorName = (String) vendor_combobox.getSelectedItem();
+
+        if (isbn.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "ISBN Masih Kosong!", "Terjadi Masalah", JOptionPane.ERROR_MESSAGE);
+            return;
+        } else if (title.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Judul Buku Masih Kosong!", "Terjadi Masalah", JOptionPane.ERROR_MESSAGE);
-        } else if (vendor.isEmpty()){
-            JOptionPane.showMessageDialog(this, "vendor Masih Kosong!", "Terjadi Masalah", JOptionPane.ERROR_MESSAGE);                       
-        } else if (totalPo.isEmpty()){
-            JOptionPane.showMessageDialog(this, "Jumlah PO Masih Kosong!", "Terjadi Masalah", JOptionPane.ERROR_MESSAGE);            
-        } else {
-            try {
-                this.queryCheck = "SELECT *FROM T_DetailMasterbuku WHERE (isbn = ? OR nama_vendor = ?) AND jenis_inventaris = ?";
-                this.stmt = mysqlConnection.getConnection().prepareStatement(queryCheck);
-            }
+            return;
+        } else if (vendorName == null || vendorName.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Vendor Masih Kosong!", "Terjadi Masalah", JOptionPane.ERROR_MESSAGE);
+            return;
         }
 
+        int totalPo;
+        try {
+            totalPo = Integer.parseInt(total_book_field.getText().trim());
+            if (totalPo <= 0) {
+                JOptionPane.showMessageDialog(this, "Jumlah PO harus lebih dari 0!", "Terjadi Masalah", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Jumlah PO tidak valid!", "Terjadi Masalah", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        try {
+            this.queryCheck = "SELECT id_vendor FROM t_detailmasterbuku WHERE nama_vendor = ? LIMIT 1";
+            this.stmt = mysqlConnection.getConnection().prepareStatement(queryCheck);
+            this.stmt.setString(1, vendorName);
+            this.rslt = stmt.executeQuery();
+
+            if (!rslt.next()) {
+                JOptionPane.showMessageDialog(this, "Vendor tidak ditemukan di database!", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            String idVendor = rslt.getString("id_vendor");
+
+            this.queryCheck = "SELECT stock_buku, harga_satuan FROM t_detailmasterbuku WHERE isbn = ? AND id_vendor = ? AND jenis_inventaris = ?";
+            this.stmt = mysqlConnection.getConnection().prepareStatement(queryCheck);
+            stmt.setString(1, isbn);
+            stmt.setString(2, idVendor);
+            stmt.setString(3, "vendor");
+            this.rslt = stmt.executeQuery();
+
+            if (!rslt.next()) {
+                JOptionPane.showMessageDialog(this, "Buku Tidak Ditemukan!", "Terjadi Masalah Ketika PO", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            int currentStock = rslt.getInt("stock_buku");
+            BigDecimal hargaSatuan = rslt.getBigDecimal("harga_satuan");
+
+            if (currentStock < totalPo) {
+                JOptionPane.showMessageDialog(this, "Stok Buku Tidak Cukup!", "Terjadi Masalah Ketika PO", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            BigDecimal grandTotalPO = hargaSatuan.multiply(BigDecimal.valueOf(totalPo));
+
+            price_field.setText(hargaSatuan.toString());
+            TotalPriceLabel.setText(grandTotalPO.toString());
+            CreateNewPOButton.setEnabled(true);
+            CloseButton.setEnabled(false);
+
+            JOptionPane.showMessageDialog(this, "Buku Tersedia! Silakan lanjutkan ke PO.", "Sukses", JOptionPane.INFORMATION_MESSAGE);
+
+        } catch (SQLException | ClassNotFoundException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Terjadi kesalahan saat akses database!", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_CheckAvailableFieldActionPerformed
 
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(POManagement.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(POManagement.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(POManagement.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(POManagement.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new POManagement().setVisible(true);
-            }
-        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton CheckAvailableField;

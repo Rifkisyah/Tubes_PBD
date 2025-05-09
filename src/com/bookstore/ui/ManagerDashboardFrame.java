@@ -51,7 +51,7 @@ public class ManagerDashboardFrame extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setPreferredSize(new java.awt.Dimension(1200, 720));
 
-        jLabel1.setIcon(new javax.swing.ImageIcon("D:\\User\\Documents\\kuliah\\semester4\\pemrograman_desktop\\project\\toko_buku\\UAS_pemrogramanDesktop_tubes\\assets\\images\\dashboard-img-scale.jpg")); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon("D:\\User\\Documents\\kuliah\\semester4\\pemrograman_desktop\\project\\toko_buku\\Fix_Tubes\\assets\\images\\dashboard-img-scale.jpg")); // NOI18N
         jLabel1.setPreferredSize(new java.awt.Dimension(1200, 690));
 
         jMenu1.setText("File");

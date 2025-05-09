@@ -55,10 +55,21 @@
             <Property name="text" type="java.lang.String" value="Purchase Order"/>
           </Properties>
           <SubComponents>
-            <MenuItem class="javax.swing.JMenuItem" name="jMenuItem6">
+            <MenuItem class="javax.swing.JMenuItem" name="CreatePOMenu">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Manajemen PO"/>
+                <Property name="text" type="java.lang.String" value="Buat PO"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="CreatePOMenuActionPerformed"/>
+              </Events>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="CheckPOMenu">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Daftar PO"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="CheckPOMenuActionPerformed"/>
+              </Events>
             </MenuItem>
           </SubComponents>
         </Menu>
@@ -131,7 +142,7 @@
     <Component class="javax.swing.JLabel" name="jLabel1">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-          <Image iconType="2" name="D:\User\Documents\kuliah\semester4\pemrograman_desktop\project\toko_buku\UAS_pemrogramanDesktop_tubes\assets\images\dashboard-inventory-img-scale.jpg"/>
+          <Image iconType="2" name="D:\User\Documents\kuliah\semester4\pemrograman_desktop\project\toko_buku\Fix_Tubes\assets\images\dashboard-inventory-img-scale.jpg"/>
         </Property>
       </Properties>
     </Component>
