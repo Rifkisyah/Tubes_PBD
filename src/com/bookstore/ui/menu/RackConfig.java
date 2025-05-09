@@ -3,11 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package com.bookstore.ui.menu;
-import com.bookstore.data.MysqlConnection;
-
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import javax.swing.JFrame;
+import com.bookstore.data.QuerySelector;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
@@ -21,11 +17,6 @@ import javax.swing.event.DocumentListener;
  */
 public class RackConfig extends javax.swing.JFrame {
     private DefaultTableModel tableModel;
-    MysqlConnection mysqlConnection;
-    PreparedStatement stmt;
-    ResultSet rslt;
-    private int countData;
-    private String queryCheck, queryInsert, queryUpdate, queryDelete;
     private String selectedRackCode = "";
     private String selectedRackName = "";
     private String selectedRackLocation = "";
@@ -84,18 +75,16 @@ public class RackConfig extends javax.swing.JFrame {
     }
     
     private void getDataTable(){
-        mysqlConnection = new MysqlConnection();
+        QuerySelector querySelector = new QuerySelector();
         
         try{
-            this.queryCheck = "SELECT *FROM T_Rak";
-            this.stmt = mysqlConnection.getConnection().prepareStatement(queryCheck);
-            this.rslt = stmt.executeQuery();
+            querySelector.getAllDataRack();
             
-            while(rslt.next()){
+            while(querySelector.getRslt().next()){
                 Object[] fieldx = new Object[3];
-                    fieldx[0] = rslt.getString("kode_rak");
-                    fieldx[1] = rslt.getString("nama_rak");
-                    fieldx[2] = rslt.getString("lokasi_rak");
+                    fieldx[0] = querySelector.getRslt().getString("kode_rak");
+                    fieldx[1] = querySelector.getRslt().getString("nama_rak");
+                    fieldx[2] = querySelector.getRslt().getString("lokasi_rak");
                     this.tableModel.addRow(fieldx);
             }
             
@@ -334,7 +323,7 @@ public class RackConfig extends javax.swing.JFrame {
     }//GEN-LAST:event_CloseButtonActionPerformed
 
     private void DeleteSelectedRackButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DeleteSelectedRackButtonActionPerformed
-        mysqlConnection = new MysqlConnection();
+        QuerySelector querySelector = new QuerySelector();
         String code = rack_code.getText().trim();
         String name = rack_name.getText().trim();
         String location = rack_location.getText().trim();
@@ -348,22 +337,14 @@ public class RackConfig extends javax.swing.JFrame {
         }
         
         try{
-            this.queryCheck = "SELECT COUNT(*) FROM T_Rak WHERE kode_rak = ?";
-            this.stmt = mysqlConnection.getConnection().prepareStatement(queryCheck);
-            stmt.setString(1, code);
-            this.rslt = stmt.executeQuery();
-            rslt.next();
-            this.countData = rslt.getInt(1);
+            querySelector.getCountRowData(code, "T_Rak", "Kode_rak");
             
-            if(countData < 0){
+            if(querySelector.getCountData() < 0){
                 JOptionPane.showMessageDialog(this, "Rak Tidak Ada!", "Gagal Menghapus Rak", JOptionPane.ERROR_MESSAGE);
             } else {
-                this.queryInsert = "DELETE FROM T_Rak WHERE kode_rak = ?";
-                this.stmt = mysqlConnection.getConnection().prepareStatement(queryInsert);
-                stmt.setString(1, code);
-                this.countData = stmt.executeUpdate();
+                querySelector.deleteRowData(code, "T_Rak", "Kode_rak");
                 
-                if(countData > 0){
+                if(querySelector.getCountData() > 0){
                     tableModel.getDataVector().removeAllElements();
                     tableModel.fireTableDataChanged();
                     
@@ -382,7 +363,7 @@ public class RackConfig extends javax.swing.JFrame {
     }//GEN-LAST:event_DeleteSelectedRackButtonActionPerformed
 
     private void AddNewRackButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AddNewRackButton1ActionPerformed
-        mysqlConnection = new MysqlConnection();
+        QuerySelector querySelector = new QuerySelector();
         String code = rack_code.getText().trim();
         String name = rack_name.getText().trim();
         String location = rack_location.getText().trim();
@@ -399,23 +380,13 @@ public class RackConfig extends javax.swing.JFrame {
         }
 
         try {
-            this.queryCheck = "SELECT COUNT(*) FROM T_Rak WHERE kode_rak = ?";
-            this.stmt = mysqlConnection.getConnection().prepareStatement(queryCheck);
-            stmt.setString(1, code);
-            this.rslt = stmt.executeQuery();
-            rslt.next();
-            this.countData = rslt.getInt(1);
+            querySelector.getCountRowData(code, "T_Rak", "kode_rak");
 
             if(AddNewRackButton1.getText().equals("Update Rak")) {
-                // Mode Update
-                this.queryInsert = "UPDATE T_Rak SET nama_rak = ?, lokasi_rak = ? WHERE kode_rak = ?";
-                this.stmt = mysqlConnection.getConnection().prepareStatement(queryInsert);
-                stmt.setString(1, name);
-                stmt.setString(2, location);
-                stmt.setString(3, code);
-                this.countData = stmt.executeUpdate();
+                
+                querySelector.updateRowDataWith3Columns(code, name, location, "T_Rak", "kode_rak", "nama_rak", "lokasi_rak");
 
-                if(countData > 0){
+                if(querySelector.getCountData() > 0){
                     JOptionPane.showMessageDialog(this, "Data Rak Berhasil Diperbarui", "Berhasil", JOptionPane.INFORMATION_MESSAGE);
                     resetFormAndRefreshTable();
                 } else {
@@ -423,17 +394,13 @@ public class RackConfig extends javax.swing.JFrame {
                 }
             } else {
                 // Mode Tambah Baru
-                if(countData > 0){
+                if(querySelector.getCountData() > 0){
                     JOptionPane.showMessageDialog(this, "Rak Sudah Ada! Tidak Bisa Menambahkan Duplikat.", "Terjadi Masalah", JOptionPane.ERROR_MESSAGE);
                 } else {
-                    this.queryInsert = "INSERT INTO T_Rak (kode_rak, nama_rak, lokasi_rak) values(?, ?, ?)";
-                    this.stmt = mysqlConnection.getConnection().prepareStatement(queryInsert);
-                    stmt.setString(1, code);
-                    stmt.setString(2, name);
-                    stmt.setString(3, location);
-                    this.countData = stmt.executeUpdate();
+                    
+                    querySelector.insertRowDataWith3Columns(code, name, location, "T_Rak", "kode_rak", "nama_rak", "lokasi_rak");
 
-                    if(countData > 0){
+                    if(querySelector.getCountData() > 0){
                         JOptionPane.showMessageDialog(this, "Rak Berhasil Ditambahkan", "Berhasil", JOptionPane.INFORMATION_MESSAGE);
                         resetFormAndRefreshTable();
                     } else {

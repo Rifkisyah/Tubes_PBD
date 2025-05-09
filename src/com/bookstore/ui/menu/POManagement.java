@@ -6,6 +6,7 @@ package com.bookstore.ui.menu;
 
 import com.bookstore.data.EmployeeAccount;
 import com.bookstore.data.MysqlConnection;
+import com.bookstore.data.QuerySelector;
 import com.bookstore.data.SessionAccount;
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
@@ -89,26 +90,23 @@ public class POManagement extends javax.swing.JFrame {
     }
     
     private void getDataTable(){
-        mysqlConnection = new MysqlConnection();
+        QuerySelector querySelector = new QuerySelector();
         
         try{
-            this.queryCheck = "SELECT *FROM T_DetailMasterbuku WHERE jenis_inventaris = ?";
-            this.stmt = mysqlConnection.getConnection().prepareStatement(queryCheck);
-            stmt.setString(1, "vendor");
-            this.rslt = stmt.executeQuery();
+            querySelector.getAllDataVendorStock();
             
-            while(rslt.next()){
+            while(querySelector.getRslt().next()){
                 Object[] fieldx = new Object[10];
-                    fieldx[0] = rslt.getString("id_detail_master_buku");
-                    fieldx[1] = rslt.getString("isbn");
-                    fieldx[2] = rslt.getString("judul_buku");
-                    fieldx[3] = rslt.getString("kode_rak");
-                    fieldx[4] = rslt.getString("nama_rak");
-                    fieldx[5] = rslt.getString("id_vendor");
-                    fieldx[6] = rslt.getString("nama_vendor");
-                    fieldx[7] = rslt.getString("stock_buku");
-                    fieldx[8] = rslt.getString("tanggal_update_stock");
-                    fieldx[9] = rslt.getString("harga_satuan");
+                    fieldx[0] = querySelector.getRslt().getString("id_detail_master_buku");
+                    fieldx[1] = querySelector.getRslt().getString("isbn");
+                    fieldx[2] = querySelector.getRslt().getString("judul_buku");
+                    fieldx[3] = querySelector.getRslt().getString("kode_rak");
+                    fieldx[4] = querySelector.getRslt().getString("nama_rak");
+                    fieldx[5] = querySelector.getRslt().getString("id_vendor");
+                    fieldx[6] = querySelector.getRslt().getString("nama_vendor");
+                    fieldx[7] = querySelector.getRslt().getString("stock_buku");
+                    fieldx[8] = querySelector.getRslt().getString("tanggal_update_stock");
+                    fieldx[9] = querySelector.getRslt().getString("harga_satuan");
                     this.tableModel.addRow(fieldx);
             }
             
@@ -136,60 +134,53 @@ public class POManagement extends javax.swing.JFrame {
         getDataTable();
     }
     
-    private void performSearch(String search_value){
-        mysqlConnection = new MysqlConnection();
-        
+    private void performSearch(String search_value) {
+        QuerySelector querySelector = new QuerySelector();
         tableModel.getDataVector().removeAllElements();
         tableModel.fireTableDataChanged();
-        
+
         try {
-            if(search_value.equals("") | search_value.isEmpty()){
+            if (search_value == null || search_value.trim().isEmpty()) {
                 getDataTable();
             } else {
-                this.queryCheck = "SELECT * FROM T_DetailMasterbuku WHERE (isbn LIKE ? OR judul_buku LIKE ?) AND jenis_inventaris = ?";
-                this.stmt = mysqlConnection.getConnection().prepareStatement(queryCheck);
-                stmt.setString(1, "%" + search_value + "%");
-                stmt.setString(2, "%" + search_value + "%");
-                stmt.setString(3, "vendor");
-                this.rslt = stmt.executeQuery();
+                querySelector.searchBookDetail(search_value, "vendor");
 
-                if (rslt.isBeforeFirst()) {
-                    while (rslt.next()) {
+                if (querySelector.getRslt().isBeforeFirst()) {
+                    while (querySelector.getRslt().next()) {
                         Object[] fieldx = new Object[10];
-                        fieldx[0] = rslt.getString("id_detail_master_buku");
-                        fieldx[1] = rslt.getString("isbn");
-                        fieldx[2] = rslt.getString("judul_buku");
-                        fieldx[3] = rslt.getString("kode_rak");
-                        fieldx[4] = rslt.getString("nama_rak");
-                        fieldx[5] = rslt.getString("id_vendor");
-                        fieldx[6] = rslt.getString("nama_vendor");
-                        fieldx[7] = rslt.getString("stock_buku");
-                        fieldx[8] = rslt.getString("tanggal_update_stock");
-                        fieldx[9] = rslt.getString("harga_satuan");
-                        this.tableModel.addRow(fieldx);
+                        fieldx[0] = querySelector.getRslt().getString("id_detail_master_buku");
+                        fieldx[1] = querySelector.getRslt().getString("isbn");
+                        fieldx[2] = querySelector.getRslt().getString("judul_buku");
+                        fieldx[3] = querySelector.getRslt().getString("kode_rak");
+                        fieldx[4] = querySelector.getRslt().getString("nama_rak");
+                        fieldx[5] = querySelector.getRslt().getString("id_vendor");
+                        fieldx[6] = querySelector.getRslt().getString("nama_vendor");
+                        fieldx[7] = querySelector.getRslt().getString("stock_buku");
+                        fieldx[8] = querySelector.getRslt().getString("tanggal_update_stock");
+                        fieldx[9] = querySelector.getRslt().getString("harga_satuan");
+                        tableModel.addRow(fieldx);
                     }
                 } else {
                     JOptionPane.showMessageDialog(this, "Buku Tidak Ditemukan!", "Gagal Mencari Rak", JOptionPane.ERROR_MESSAGE);
                 }
             }
-
-        } catch (SQLException | ClassNotFoundException ex){
+        } catch (SQLException | ClassNotFoundException ex) {
             ex.printStackTrace();
         }
     }
 
-    private void dataVendorComboBox(){
-        mysqlConnection = new MysqlConnection();
+    private void dataVendorComboBox() {
+        QuerySelector querySelector = new QuerySelector();
+
         try {
-            this.queryCheck = "SELECT *FROM T_Vendor";
-            this.stmt = mysqlConnection.getConnection().prepareStatement(queryCheck);
-            this.rslt = stmt.executeQuery();
-            
+            querySelector.getAllVendor();
+            ResultSet rslt = querySelector.getRslt();
+
             vendor_combobox.removeAllItems();
-            while(rslt.next()){
+            while (rslt.next()) {
                 vendor_combobox.addItem(rslt.getString("nama_vendor"));
             }
-        } catch (SQLException | ClassNotFoundException ex){
+        } catch (SQLException | ClassNotFoundException ex) {
             ex.printStackTrace();
         }
     }
@@ -200,31 +191,18 @@ public class POManagement extends javax.swing.JFrame {
     
     private void insertPurchaseOrder(String isbn, String idVendor, int jumlahPO, BigDecimal hargaSatuan) {
         try {
-            mysqlConnection = new MysqlConnection();
             EmployeeAccount employeeAccount = SessionAccount.getSessionAccount();
-
             String idPegawai = employeeAccount.getId();
+
             String notaPO = generateNotaPO();
             LocalDate tanggalPO = LocalDate.now();
             LocalDate estimasiDatang = tanggalPO.plusDays(7);
             BigDecimal totalBiaya = hargaSatuan.multiply(BigDecimal.valueOf(jumlahPO));
             String statusPO = "Diproses";
 
-            String queryInsert = "INSERT INTO t_purchaseorder (nota_PO, id_pegawai, id_vendor, isbn, tanggal_po, estimasi_tanggal_datang, jumlah_po, total_biaya, status_po) " +
-                                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            QuerySelector querySelector = new QuerySelector();
+            querySelector.insertPurchaseOrder(notaPO, idPegawai, idVendor, isbn, tanggalPO, estimasiDatang, jumlahPO, totalBiaya, statusPO);
 
-            PreparedStatement insertStmt = mysqlConnection.getConnection().prepareStatement(queryInsert);
-            insertStmt.setString(1, notaPO);
-            insertStmt.setString(2, idPegawai);
-            insertStmt.setString(3, idVendor);
-            insertStmt.setString(4, isbn);
-            insertStmt.setDate(5, java.sql.Date.valueOf(tanggalPO));
-            insertStmt.setDate(6, java.sql.Date.valueOf(estimasiDatang));
-            insertStmt.setInt(7, jumlahPO);
-            insertStmt.setBigDecimal(8, totalBiaya);
-            insertStmt.setString(9, statusPO);
-
-            insertStmt.executeUpdate();
             JOptionPane.showMessageDialog(this, "PO berhasil dibuat dengan Nota: " + notaPO, "Sukses", JOptionPane.INFORMATION_MESSAGE);
 
         } catch (SQLException | ClassNotFoundException ex) {
@@ -232,6 +210,7 @@ public class POManagement extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Gagal membuat PO!", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
+
 
     
     /**
@@ -513,8 +492,6 @@ public class POManagement extends javax.swing.JFrame {
     }//GEN-LAST:event_CloseButtonActionPerformed
 
     private void CreateNewPOButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CreateNewPOButtonActionPerformed
-        mysqlConnection = new MysqlConnection();
-
         String isbn = isbn_field.getText().trim();
         String vendorName = (String) vendor_combobox.getSelectedItem();
         int jumlahPO;
@@ -529,47 +506,28 @@ public class POManagement extends javax.swing.JFrame {
         }
 
         try {
-            String getIdVendorQuery = "SELECT id_vendor FROM t_detailmasterbuku WHERE nama_vendor = ? LIMIT 1";
-            PreparedStatement vendorStmt = mysqlConnection.getConnection().prepareStatement(getIdVendorQuery);
-            vendorStmt.setString(1, vendorName);
-            ResultSet rs = vendorStmt.executeQuery();
+            QuerySelector querySelector = new QuerySelector();
+            String idVendor = querySelector.getIdVendorByName(vendorName);
 
-            if (!rs.next()) {
+            if (idVendor == null) {
                 JOptionPane.showMessageDialog(this, "Vendor tidak ditemukan!", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            String idVendor = rs.getString("id_vendor");
-
-            // Update stock
-            String stockQuery = "SELECT stock_buku FROM t_detailmasterbuku WHERE isbn = ? AND id_vendor = ?";
-            PreparedStatement stockStmt = mysqlConnection.getConnection().prepareStatement(stockQuery);
-            stockStmt.setString(1, isbn);
-            stockStmt.setString(2, idVendor);
-            ResultSet stockResult = stockStmt.executeQuery();
-
-            if (!stockResult.next()) {
+            int currentStock = querySelector.getCurrentStock(isbn, idVendor);
+            if (currentStock == -1) {
                 JOptionPane.showMessageDialog(this, "Data stok tidak ditemukan!", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            int currentStock = stockResult.getInt("stock_buku");
             int newStock = currentStock - jumlahPO;
-
             if (newStock < 0) {
                 JOptionPane.showMessageDialog(this, "Stok tidak mencukupi saat proses update!", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            String updateStockQuery = "UPDATE t_detailmasterbuku SET stock_buku = ?, tanggal_update_stock = NOW() WHERE isbn = ? AND id_vendor = ?";
-            PreparedStatement updateStmt = mysqlConnection.getConnection().prepareStatement(updateStockQuery);
-            updateStmt.setInt(1, newStock);
-            updateStmt.setString(2, isbn);
-            updateStmt.setString(3, idVendor);
-            updateStmt.executeUpdate();
-
-            // Insert PO
-            insertPurchaseOrder(isbn, idVendor, jumlahPO, hargaSatuan);
+            querySelector.updateStock(isbn, idVendor, newStock);
+            insertPurchaseOrder(isbn, idVendor, jumlahPO, hargaSatuan); // masih panggil method refactored sebelumnya
 
             CreateNewPOButton.setEnabled(false);
             CloseButton.setEnabled(true);
@@ -594,8 +552,6 @@ public class POManagement extends javax.swing.JFrame {
     }//GEN-LAST:event_VendorStockBookTableMouseClicked
 
     private void CheckAvailableFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CheckAvailableFieldActionPerformed
-        mysqlConnection = new MysqlConnection();
-
         String isbn = isbn_field.getText().trim();
         String title = book_title_field.getText().trim();
         String vendorName = (String) vendor_combobox.getSelectedItem();
@@ -624,40 +580,31 @@ public class POManagement extends javax.swing.JFrame {
         }
 
         try {
-            this.queryCheck = "SELECT id_vendor FROM t_detailmasterbuku WHERE nama_vendor = ? LIMIT 1";
-            this.stmt = mysqlConnection.getConnection().prepareStatement(queryCheck);
-            this.stmt.setString(1, vendorName);
-            this.rslt = stmt.executeQuery();
+            QuerySelector querySelector = new QuerySelector();
 
-            if (!rslt.next()) {
+            // Dapatkan id_vendor berdasarkan nama vendor
+            String idVendor = querySelector.getIdVendorByName(vendorName);
+            if (idVendor == null) {
                 JOptionPane.showMessageDialog(this, "Vendor tidak ditemukan di database!", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            String idVendor = rslt.getString("id_vendor");
-
-            this.queryCheck = "SELECT stock_buku, harga_satuan FROM t_detailmasterbuku WHERE isbn = ? AND id_vendor = ? AND jenis_inventaris = ?";
-            this.stmt = mysqlConnection.getConnection().prepareStatement(queryCheck);
-            stmt.setString(1, isbn);
-            stmt.setString(2, idVendor);
-            stmt.setString(3, "vendor");
-            this.rslt = stmt.executeQuery();
-
-            if (!rslt.next()) {
+            // Dapatkan stok dan harga satuan berdasarkan ISBN dan idVendor
+            int currentStock = querySelector.getStockAndPrice(isbn, idVendor);
+            if (currentStock == -1) {
                 JOptionPane.showMessageDialog(this, "Buku Tidak Ditemukan!", "Terjadi Masalah Ketika PO", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-
-            int currentStock = rslt.getInt("stock_buku");
-            BigDecimal hargaSatuan = rslt.getBigDecimal("harga_satuan");
 
             if (currentStock < totalPo) {
                 JOptionPane.showMessageDialog(this, "Stok Buku Tidak Cukup!", "Terjadi Masalah Ketika PO", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
+            BigDecimal hargaSatuan = querySelector.getHargaSatuan(isbn, idVendor); // Mendapatkan harga satuan
             BigDecimal grandTotalPO = hargaSatuan.multiply(BigDecimal.valueOf(totalPo));
 
+            // Update UI
             price_field.setText(hargaSatuan.toString());
             TotalPriceLabel.setText(grandTotalPO.toString());
             CreateNewPOButton.setEnabled(true);

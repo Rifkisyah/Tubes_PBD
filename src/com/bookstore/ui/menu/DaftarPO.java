@@ -4,9 +4,7 @@
  */
 package com.bookstore.ui.menu;
 
-import com.bookstore.data.MysqlConnection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import com.bookstore.data.QuerySelector;
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
@@ -18,11 +16,6 @@ import javax.swing.table.TableColumn;
  */
 public class DaftarPO extends javax.swing.JFrame {
     private DefaultTableModel tableModel;
-    MysqlConnection mysqlConnection;
-    PreparedStatement stmt;
-    ResultSet rslt;
-    private int countData;
-    private String queryCheck, queryInsert, queryUpdate, queryDelete;
     /**
      * Creates new form NewJFrame
      */
@@ -67,45 +60,25 @@ public class DaftarPO extends javax.swing.JFrame {
     }
     
     private void getDataTable(){
-        mysqlConnection = new MysqlConnection();
+        QuerySelector querySelector = new QuerySelector();
 
         try{
-            this.queryCheck = 
-                "SELECT " +
-                "po.nota_PO, " +
-                "po.id_pegawai, " +
-                "ap.nama AS nama_pegawai, " +
-                "po.id_vendor, " +
-                "v.Nama_Vendor, " +
-                "po.isbn, " +
-                "mb.judul_buku, " +
-                "po.tanggal_PO, " +
-                "po.estimasi_tanggal_datang, " +
-                "po.jumlah_PO, " +
-                "po.total_biaya, " +
-                "po.status_PO " +
-                "FROM T_PurchaseOrder po " +
-                "JOIN T_AkunPegawai ap ON po.id_pegawai = ap.id_pegawai " +
-                "JOIN T_MasterBuku mb ON po.isbn = mb.isbn " +
-                "JOIN T_Vendor v ON po.id_vendor = v.id_vendor";
+            querySelector.getAllDataPo();
 
-            this.stmt = mysqlConnection.getConnection().prepareStatement(queryCheck);
-            this.rslt = stmt.executeQuery();
-
-            while(rslt.next()){
+            while(querySelector.getRslt().next()){
                 Object[] fieldx = new Object[12];
-                fieldx[0] = rslt.getString("nota_PO");
-                fieldx[1] = rslt.getString("id_pegawai");
-                fieldx[2] = rslt.getString("nama_pegawai");
-                fieldx[3] = rslt.getString("id_vendor");
-                fieldx[4] = rslt.getString("Nama_Vendor");
-                fieldx[5] = rslt.getString("isbn");
-                fieldx[6] = rslt.getString("judul_buku");
-                fieldx[7] = rslt.getString("tanggal_PO");
-                fieldx[8] = rslt.getString("estimasi_tanggal_datang");
-                fieldx[9] = rslt.getInt("jumlah_PO");
-                fieldx[10] = rslt.getDouble("total_biaya");
-                fieldx[11] = rslt.getString("status_PO");
+                fieldx[0] = querySelector.getRslt().getString("nota_PO");
+                fieldx[1] = querySelector.getRslt().getString("id_pegawai");
+                fieldx[2] = querySelector.getRslt().getString("nama_pegawai");
+                fieldx[3] = querySelector.getRslt().getString("id_vendor");
+                fieldx[4] = querySelector.getRslt().getString("Nama_Vendor");
+                fieldx[5] = querySelector.getRslt().getString("isbn");
+                fieldx[6] = querySelector.getRslt().getString("judul_buku");
+                fieldx[7] = querySelector.getRslt().getString("tanggal_PO");
+                fieldx[8] = querySelector.getRslt().getString("estimasi_tanggal_datang");
+                fieldx[9] = querySelector.getRslt().getInt("jumlah_PO");
+                fieldx[10] = querySelector.getRslt().getDouble("total_biaya");
+                fieldx[11] = querySelector.getRslt().getString("status_PO");
 
                 this.tableModel.addRow(fieldx);
             }
@@ -245,38 +218,6 @@ public class DaftarPO extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(DaftarPO.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(DaftarPO.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(DaftarPO.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(DaftarPO.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new DaftarPO().setVisible(true);
-            }
-        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton CloseButton;

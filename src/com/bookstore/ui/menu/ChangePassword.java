@@ -6,6 +6,7 @@ package com.bookstore.ui.menu;
 
 import com.bookstore.data.EmployeeAccount;
 import com.bookstore.data.MysqlConnection;
+import com.bookstore.data.QuerySelector;
 import com.bookstore.data.SessionAccount;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -193,35 +194,28 @@ public class ChangePassword extends javax.swing.JFrame {
             return;
         }
         
-        MysqlConnection mysqlConnection = new MysqlConnection();
-        String check = "SELECT *FROM T_AkunPegawai WHERE id_pegawai = ? AND password = ?";
-        PreparedStatement stmt = null;
-        
         try {
-            stmt = mysqlConnection.getConnection().prepareStatement(check);
-            stmt.setString(1, employeeAccount.getId());
-            stmt.setString(2, old_pwd);
-            ResultSet rst = stmt.executeQuery();
-            if (rst.next()) {
-                String updatePassword = "UPDATE T_AkunPegawai SET password = ? WHERE id_pegawai = ?";
-                stmt = mysqlConnection.getConnection().prepareStatement(updatePassword);
-                stmt.setString(1, confirm_pwd);
-                stmt.setString(2, employeeAccount.getId());
-                stmt.executeUpdate();
+            QuerySelector querySelector = new QuerySelector();
+            ResultSet rst = querySelector.checkPassword(employeeAccount.getId(), old_pwd);
 
-                employeeAccount = new EmployeeAccount(
+            if (rst.next()) {
+                int rowsUpdated = querySelector.updatePassword(employeeAccount.getId(), confirm_pwd);
+                if (rowsUpdated > 0) {
+                    employeeAccount = new EmployeeAccount(
                         rst.getString("id_pegawai"),
                         rst.getString("id_role"),
                         rst.getString("nama"),
-                        rst.getString("password")
-                );
-                SessionAccount.setSessionAccount(employeeAccount);
-                
-                old_password.setText("");
-                new_password.setText("");
-                confirm_password.setText("");
-                JOptionPane.showMessageDialog(this, "Password Berhasil Di Ubah!", "Informasi", JOptionPane.INFORMATION_MESSAGE);
+                        confirm_pwd
+                    );
+                    SessionAccount.setSessionAccount(employeeAccount);
+
+                    old_password.setText("");
+                    new_password.setText("");
+                    confirm_password.setText("");
+                    JOptionPane.showMessageDialog(this, "Password Berhasil Di Ubah!", "Informasi", JOptionPane.INFORMATION_MESSAGE);
+                }
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException ex) {

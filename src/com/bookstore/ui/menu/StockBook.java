@@ -5,6 +5,7 @@
 package com.bookstore.ui.menu;
 
 import com.bookstore.data.MysqlConnection;
+import com.bookstore.data.QuerySelector;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -63,26 +64,23 @@ public class StockBook extends javax.swing.JFrame {
     }
     
     private void getDataTable(){
-        mysqlConnection = new MysqlConnection();
+        QuerySelector querySelector = new QuerySelector();
         
         try{
-            this.queryCheck = "SELECT *FROM T_DetailMasterbuku WHERE jenis_inventaris = ?";
-            this.stmt = mysqlConnection.getConnection().prepareStatement(queryCheck);
-            stmt.setString(1, "toko");
-            this.rslt = stmt.executeQuery();
+            querySelector.getAllDataStock();
             
-            while(rslt.next()){
+            while(querySelector.getRslt().next()){
                 Object[] fieldx = new Object[10];
-                    fieldx[0] = rslt.getString("id_detail_master_buku");
-                    fieldx[1] = rslt.getString("isbn");
-                    fieldx[2] = rslt.getString("judul_buku");
-                    fieldx[3] = rslt.getString("kode_rak");
-                    fieldx[4] = rslt.getString("nama_rak");
-                    fieldx[5] = rslt.getString("id_vendor");
-                    fieldx[6] = rslt.getString("nama_vendor");
-                    fieldx[7] = rslt.getString("stock_buku");
-                    fieldx[8] = rslt.getString("tanggal_update_stock");
-                    fieldx[9] = rslt.getString("harga_satuan");
+                    fieldx[0] = querySelector.getRslt().getString("id_detail_master_buku");
+                    fieldx[1] = querySelector.getRslt().getString("isbn");
+                    fieldx[2] = querySelector.getRslt().getString("judul_buku");
+                    fieldx[3] = querySelector.getRslt().getString("kode_rak");
+                    fieldx[4] = querySelector.getRslt().getString("nama_rak");
+                    fieldx[5] = querySelector.getRslt().getString("id_vendor");
+                    fieldx[6] = querySelector.getRslt().getString("nama_vendor");
+                    fieldx[7] = querySelector.getRslt().getString("stock_buku");
+                    fieldx[8] = querySelector.getRslt().getString("tanggal_update_stock");
+                    fieldx[9] = querySelector.getRslt().getString("harga_satuan");
                     this.tableModel.addRow(fieldx);
             }
             
@@ -220,37 +218,6 @@ public class StockBook extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(StockBook.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(StockBook.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(StockBook.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(StockBook.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new StockBook().setVisible(true);
-            }
-        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton CloseButton;
