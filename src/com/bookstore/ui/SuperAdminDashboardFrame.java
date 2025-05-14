@@ -65,14 +65,7 @@ public class SuperAdminDashboardFrame extends javax.swing.JFrame {
         jMenu3 = new javax.swing.JMenu();
         MaintenancePegawaiMenu = new javax.swing.JMenuItem();
         MaintenanceRolePegawaiMenu = new javax.swing.JMenuItem();
-        jMenu2 = new javax.swing.JMenu();
-        jMenuItem9 = new javax.swing.JMenuItem();
         jMenuItem10 = new javax.swing.JMenuItem();
-        JMenuBuku = new javax.swing.JMenu();
-        jMenuItem5 = new javax.swing.JMenuItem();
-        jMenuItem6 = new javax.swing.JMenuItem();
-        jMenuItem7 = new javax.swing.JMenuItem();
-        jMenuItem8 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -129,22 +122,6 @@ public class SuperAdminDashboardFrame extends javax.swing.JFrame {
         });
         jMenu3.add(MaintenanceRolePegawaiMenu);
 
-        jMenuBar1.add(jMenu3);
-
-        jMenu2.setBackground(new java.awt.Color(33, 52, 72));
-        jMenu2.setForeground(new java.awt.Color(255, 255, 255));
-        jMenu2.setText("Master Data");
-
-        jMenuItem9.setBackground(new java.awt.Color(84, 119, 146));
-        jMenuItem9.setForeground(new java.awt.Color(255, 255, 255));
-        jMenuItem9.setText("Detail Buku");
-        jMenuItem9.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem9ActionPerformed(evt);
-            }
-        });
-        jMenu2.add(jMenuItem9);
-
         jMenuItem10.setBackground(new java.awt.Color(84, 119, 146));
         jMenuItem10.setForeground(new java.awt.Color(255, 255, 255));
         jMenuItem10.setText("Konfigurasi Data Vendor");
@@ -153,35 +130,9 @@ public class SuperAdminDashboardFrame extends javax.swing.JFrame {
                 jMenuItem10ActionPerformed(evt);
             }
         });
-        jMenu2.add(jMenuItem10);
+        jMenu3.add(jMenuItem10);
 
-        JMenuBuku.setBackground(new java.awt.Color(84, 119, 146));
-        JMenuBuku.setForeground(new java.awt.Color(33, 52, 72));
-        JMenuBuku.setText("Buku");
-
-        jMenuItem5.setBackground(new java.awt.Color(84, 119, 146));
-        jMenuItem5.setForeground(new java.awt.Color(255, 255, 255));
-        jMenuItem5.setText("Data Master Buku");
-        JMenuBuku.add(jMenuItem5);
-
-        jMenuItem6.setBackground(new java.awt.Color(84, 119, 146));
-        jMenuItem6.setForeground(new java.awt.Color(255, 255, 255));
-        jMenuItem6.setText("Data Kategori Buku");
-        JMenuBuku.add(jMenuItem6);
-
-        jMenuItem7.setBackground(new java.awt.Color(84, 119, 146));
-        jMenuItem7.setForeground(new java.awt.Color(255, 255, 255));
-        jMenuItem7.setText("Data  Penerbit");
-        JMenuBuku.add(jMenuItem7);
-
-        jMenuItem8.setBackground(new java.awt.Color(84, 119, 146));
-        jMenuItem8.setForeground(new java.awt.Color(255, 255, 255));
-        jMenuItem8.setText("Data Pengarang");
-        JMenuBuku.add(jMenuItem8);
-
-        jMenu2.add(JMenuBuku);
-
-        jMenuBar1.add(jMenu2);
+        jMenuBar1.add(jMenu3);
 
         setJMenuBar(jMenuBar1);
 
@@ -224,10 +175,6 @@ public class SuperAdminDashboardFrame extends javax.swing.JFrame {
         this.setEnabled(false);
     }//GEN-LAST:event_MaintenanceRolePegawaiMenuActionPerformed
 
-    private void jMenuItem9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem9ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jMenuItem9ActionPerformed
-
     private void jMenuItem10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem10ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jMenuItem10ActionPerformed
@@ -246,19 +193,12 @@ public class SuperAdminDashboardFrame extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem ChangePassword;
     private javax.swing.JMenuItem Exit;
-    private javax.swing.JMenu JMenuBuku;
     private javax.swing.JMenuItem MaintenancePegawaiMenu;
     private javax.swing.JMenuItem MaintenanceRolePegawaiMenu;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem10;
-    private javax.swing.JMenuItem jMenuItem5;
-    private javax.swing.JMenuItem jMenuItem6;
-    private javax.swing.JMenuItem jMenuItem7;
-    private javax.swing.JMenuItem jMenuItem8;
-    private javax.swing.JMenuItem jMenuItem9;
     // End of variables declaration//GEN-END:variables
 }
