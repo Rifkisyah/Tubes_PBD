@@ -1,40 +1,53 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
-package com.bookstore.ui.menu;
+package com.bookstore.ui.inventory_menu;
 
-import com.bookstore.data.MysqlConnection;
 import com.bookstore.data.QuerySelector;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import com.bookstore.ui.InventoryDashboardFrame;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
+import javax.swing.JFrame;
 
 /**
  *
  * @author rifki
  */
 public class StockBook extends javax.swing.JFrame {
-    private DefaultTableModel tableModel;
-    MysqlConnection mysqlConnection;
-    PreparedStatement stmt;
-    ResultSet rslt;
-    private int countData;
-    private String queryCheck, queryInsert, queryUpdate, queryDelete;
+    InventoryDashboardFrame inventoryDashboardFrame;
+    private DefaultTableModel model;
+    QuerySelector querySelector;
     /**
      * Creates new form StockBook
      */
-    public StockBook() {
-        this.setUndecorated(true);
-        this.setAlwaysOnTop(true);
+    public StockBook(InventoryDashboardFrame inventoryDashboardFrame) {
         
+        this.inventoryDashboardFrame = inventoryDashboardFrame;
+
         initComponents();
         this.setLocationRelativeTo(null);
+        setTitle("Toko Buku - Daftar Stock Buku");
+        
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                int option = JOptionPane.showConfirmDialog(
+                        StockBook.this,
+                        "Apakah Kamu Yakin Ingin Keluar Dari Aplikasi?",
+                        "Konfirmasi Keluar", JOptionPane.YES_NO_OPTION);
+                if(option == JOptionPane.YES_OPTION){
+                    StockBook.this.setVisible(false);
+                    inventoryDashboardFrame.setEnabled(true);
+                    inventoryDashboardFrame.requestFocus();
+                } else {
+                    StockBook.this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                }
+            }
+        });
 
         setHeaderTable();
+
     }
     
     private void columnSizing(){
@@ -64,24 +77,26 @@ public class StockBook extends javax.swing.JFrame {
     }
     
     private void getDataTable(){
-        QuerySelector querySelector = new QuerySelector();
+        this.querySelector = new QuerySelector();
         
         try{
-            querySelector.getAllDataStock();
+            querySelector.selectDetailMasterBuku("toko");
             
-            while(querySelector.getRslt().next()){
+            model.setRowCount(0);
+            
+            while(this.querySelector.getResultSet().next()){
                 Object[] fieldx = new Object[10];
-                    fieldx[0] = querySelector.getRslt().getString("id_detail_master_buku");
-                    fieldx[1] = querySelector.getRslt().getString("isbn");
-                    fieldx[2] = querySelector.getRslt().getString("judul_buku");
-                    fieldx[3] = querySelector.getRslt().getString("kode_rak");
-                    fieldx[4] = querySelector.getRslt().getString("nama_rak");
-                    fieldx[5] = querySelector.getRslt().getString("id_vendor");
-                    fieldx[6] = querySelector.getRslt().getString("nama_vendor");
-                    fieldx[7] = querySelector.getRslt().getString("stock_buku");
-                    fieldx[8] = querySelector.getRslt().getString("tanggal_update_stock");
-                    fieldx[9] = querySelector.getRslt().getString("harga_satuan");
-                    this.tableModel.addRow(fieldx);
+                    fieldx[0] = querySelector.getResultSet().getString("id_detail_master_buku");
+                    fieldx[1] = querySelector.getResultSet().getString("isbn");
+                    fieldx[2] = querySelector.getResultSet().getString("judul_buku");
+                    fieldx[3] = querySelector.getResultSet().getString("kode_rak");
+                    fieldx[4] = querySelector.getResultSet().getString("nama_rak");
+                    fieldx[5] = querySelector.getResultSet().getString("id_vendor");
+                    fieldx[6] = querySelector.getResultSet().getString("nama_vendor");
+                    fieldx[7] = querySelector.getResultSet().getString("stock_buku");
+                    fieldx[8] = querySelector.getResultSet().getString("tanggal_update_stock");
+                    fieldx[9] = querySelector.getResultSet().getString("harga_satuan");
+                    this.model.addRow(fieldx);
             }
             
         } catch (SQLException | ClassNotFoundException ex){
@@ -90,20 +105,19 @@ public class StockBook extends javax.swing.JFrame {
     }
     
     private void setHeaderTable(){
-        this.tableModel = new DefaultTableModel();
-        StockBookTable.setModel(tableModel);
+        this.model = new DefaultTableModel();
+        model.addColumn("ID Stock");
+        model.addColumn("ISBN");
+        model.addColumn("Judul Buku");
+        model.addColumn("ID Rak");
+        model.addColumn("Nama Rak");
+        model.addColumn("ID Vendor");
+        model.addColumn("Nama Vendor");
+        model.addColumn("Jumlah Stock");
+        model.addColumn("Tanggal Update Stock");
+        model.addColumn("Harga Satuan");
         
-        tableModel.addColumn("ID Stock");
-        tableModel.addColumn("ISBN");
-        tableModel.addColumn("Judul Buku");
-        tableModel.addColumn("ID Rak");
-        tableModel.addColumn("Nama Rak");
-        tableModel.addColumn("ID Vendor");
-        tableModel.addColumn("Nama Vendor");
-        tableModel.addColumn("Jumlah Stock");
-        tableModel.addColumn("Tanggal Update Stock");
-        tableModel.addColumn("Harga Satuan");
-        
+        StockBookTable.setModel(model);
         columnSizing();
         getDataTable();
     }
@@ -129,9 +143,8 @@ public class StockBook extends javax.swing.JFrame {
         jLabel1.setText("Konfigurasi Rak");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(520, 370));
 
-        jPanel1.setBackground(new java.awt.Color(102, 102, 255));
+        jPanel1.setBackground(new java.awt.Color(84, 119, 146));
         jPanel1.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 204), 3, true));
         jPanel1.setPreferredSize(new java.awt.Dimension(520, 370));
 
@@ -140,10 +153,8 @@ public class StockBook extends javax.swing.JFrame {
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel2.setText("Daftar Stock Buku");
 
-        StockBookTable.setBackground(new java.awt.Color(153, 153, 255));
         StockBookTable.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 153), 1, true));
         StockBookTable.setFont(new java.awt.Font("Ebrima", 1, 14)); // NOI18N
-        StockBookTable.setForeground(new java.awt.Color(255, 255, 255));
         StockBookTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null, null, null, null, null},
@@ -158,7 +169,7 @@ public class StockBook extends javax.swing.JFrame {
         StockBookTable.setAlignmentY(1.0F);
         jScrollPane1.setViewportView(StockBookTable);
 
-        CloseButton.setBackground(new java.awt.Color(204, 0, 51));
+        CloseButton.setBackground(new java.awt.Color(33, 52, 72));
         CloseButton.setFont(new java.awt.Font("Ebrima", 1, 14)); // NOI18N
         CloseButton.setForeground(new java.awt.Color(255, 255, 255));
         CloseButton.setText("Keluar");
@@ -211,7 +222,8 @@ public class StockBook extends javax.swing.JFrame {
     private void CloseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CloseButtonActionPerformed
         if(JOptionPane.showConfirmDialog(this, "Apakah Kamu Yakin Ingin Keluar?", "Konfirmasi Keluar", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION){
             this.setVisible(false);
-            this.setFocusable(false);
+            inventoryDashboardFrame.setEnabled(true);
+            inventoryDashboardFrame.requestFocus();
         }
     }//GEN-LAST:event_CloseButtonActionPerformed
 

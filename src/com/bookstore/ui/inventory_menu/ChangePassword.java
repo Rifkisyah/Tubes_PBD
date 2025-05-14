@@ -2,17 +2,17 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package com.bookstore.ui.menu;
+package com.bookstore.ui.inventory_menu;
 
 import com.bookstore.data.EmployeeAccount;
-import com.bookstore.data.MysqlConnection;
 import com.bookstore.data.QuerySelector;
 import com.bookstore.data.SessionAccount;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 /**
@@ -20,18 +20,32 @@ import javax.swing.JOptionPane;
  * @author rifki
  */
 public class ChangePassword extends javax.swing.JFrame {
-
+    QuerySelector querySelector;
     /**
      * Creates new form ChangePassword
      */
     public ChangePassword() {
-        this.setUndecorated(true);
-        this.setAlwaysOnTop(true);
         
         initComponents();
         this.setLocationRelativeTo(null);
+        setTitle("Toko Buku - Ganti Password");
+        
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                int option = JOptionPane.showConfirmDialog(
+                        ChangePassword.this,
+                        "Apakah Kamu Yakin Ingin Keluar?",
+                        "Konfirmasi Keluar", JOptionPane.YES_NO_OPTION);
+                if(option == JOptionPane.YES_OPTION){
+                    ChangePassword.this.setVisible(false);
+                } else {
+                    ChangePassword.this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                }
+            }
+        });
+        
         this.setSize(450, 350);
-
     }
 
     /**
@@ -56,10 +70,8 @@ public class ChangePassword extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(255, 153, 153));
-        setPreferredSize(new java.awt.Dimension(430, 250));
 
-        jPanel1.setBackground(new java.awt.Color(255, 153, 153));
-        jPanel1.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(153, 0, 0), 3, true));
+        jPanel1.setBackground(new java.awt.Color(84, 119, 146));
         jPanel1.setPreferredSize(new java.awt.Dimension(450, 300));
 
         jLabel4.setFont(new java.awt.Font("Ebrima", 1, 24)); // NOI18N
@@ -86,7 +98,7 @@ public class ChangePassword extends javax.swing.JFrame {
 
         confirm_password.setFont(new java.awt.Font("Agency FB", 0, 14)); // NOI18N
 
-        SaveNewPasswordButton.setBackground(new java.awt.Color(0, 153, 0));
+        SaveNewPasswordButton.setBackground(new java.awt.Color(33, 52, 72));
         SaveNewPasswordButton.setFont(new java.awt.Font("Ebrima", 1, 14)); // NOI18N
         SaveNewPasswordButton.setForeground(new java.awt.Color(255, 255, 255));
         SaveNewPasswordButton.setText("Simpan");
@@ -123,15 +135,15 @@ public class ChangePassword extends javax.swing.JFrame {
                                     .addComponent(jLabel1)
                                     .addComponent(jLabel3))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(new_password, javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(old_password, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 198, Short.MAX_VALUE)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(new_password)
+                                    .addComponent(old_password, javax.swing.GroupLayout.DEFAULT_SIZE, 187, Short.MAX_VALUE)
                                     .addComponent(confirm_password)))
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(CancelNewPasswordButton)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(SaveNewPasswordButton)))
-                        .addGap(0, 13, Short.MAX_VALUE)))
+                        .addGap(0, 30, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -139,7 +151,7 @@ public class ChangePassword extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(21, 21, 21)
                 .addComponent(jLabel4)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 37, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(old_password, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1))
@@ -178,33 +190,41 @@ public class ChangePassword extends javax.swing.JFrame {
         String new_pwd = new String(new_password.getPassword());
         String confirm_pwd = new String(confirm_password.getPassword());
         
-        if(old_pwd.equals("") || new_pwd.equals("") && confirm_pwd.equals("")){
-            JOptionPane.showMessageDialog(this, "Data Input Masih Kosong!", "Terjadi Masalah", JOptionPane.ERROR_MESSAGE);
-            return;
-            
-        }else if(!confirm_pwd.equals(new_pwd)){
-            JOptionPane.showMessageDialog(this, "Konfirmasi Password Tidak Sama!", "Terjadi Masalah", JOptionPane.ERROR_MESSAGE);
-            confirm_password.setText("");
-            return;
-            
-        } else if(old_pwd.equals(new_pwd)){
-            JOptionPane.showMessageDialog(this, "Password Tidak Berubah!", "Terjadi Masalah", JOptionPane.ERROR_MESSAGE);
-            new_password.setText("");
-            confirm_password.setText("");
-            return;
-        }
-        
         try {
-            QuerySelector querySelector = new QuerySelector();
-            ResultSet rst = querySelector.checkPassword(employeeAccount.getId(), old_pwd);
+            this.querySelector = new QuerySelector();
+                    
+            querySelector.selectAllByTwoColumns("T_AkunPegawai", "id_pegawai", employeeAccount.getId(), "password", old_pwd);
+            EmployeeAccount employeeAccount1 = SessionAccount.getSessionAccount();
+            
+            if(!employeeAccount.getPassword().equals(old_pwd)){
+                JOptionPane.showMessageDialog(this, "Password lama Salah!", "Terjadi Masalah", JOptionPane.ERROR_MESSAGE);
+                return; 
+            }
+            if(old_pwd.equals("") || new_pwd.equals("") || confirm_pwd.equals("")){
+                JOptionPane.showMessageDialog(this, "Data Input Masih Kosong!", "Terjadi Masalah", JOptionPane.ERROR_MESSAGE);
+                return;
 
-            if (rst.next()) {
-                int rowsUpdated = querySelector.updatePassword(employeeAccount.getId(), confirm_pwd);
-                if (rowsUpdated > 0) {
+            }else if(!confirm_pwd.equals(new_pwd)){
+                JOptionPane.showMessageDialog(this, "Konfirmasi Password Tidak Sama!", "Terjadi Masalah", JOptionPane.ERROR_MESSAGE);
+                confirm_password.setText("");
+                return;
+
+            } else if(old_pwd.equals(new_pwd)){
+                JOptionPane.showMessageDialog(this, "Password Tidak Berubah!", "Terjadi Masalah", JOptionPane.ERROR_MESSAGE);
+                new_password.setText("");
+                confirm_password.setText("");
+                return;
+            }
+
+            if (querySelector.getResultSet().next()) {
+                
+                querySelector.updateOneColumn("T_AkunPegawai", "password", confirm_pwd, "id_pegawai", employeeAccount.getId());
+                
+                if (querySelector.getAffectedRows() > 0) {
                     employeeAccount = new EmployeeAccount(
-                        rst.getString("id_pegawai"),
-                        rst.getString("id_role"),
-                        rst.getString("nama"),
+                        querySelector.getResultSet().getString("id_pegawai"),
+                        querySelector.getResultSet().getString("id_role"),
+                        querySelector.getResultSet().getString("nama"),
                         confirm_pwd
                     );
                     SessionAccount.setSessionAccount(employeeAccount);

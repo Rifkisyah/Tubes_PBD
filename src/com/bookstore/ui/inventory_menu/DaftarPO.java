@@ -2,10 +2,14 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package com.bookstore.ui.menu;
+package com.bookstore.ui.inventory_menu;
 
 import com.bookstore.data.QuerySelector;
+import com.bookstore.ui.InventoryDashboardFrame;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.sql.SQLException;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
@@ -15,16 +19,35 @@ import javax.swing.table.TableColumn;
  * @author rifki
  */
 public class DaftarPO extends javax.swing.JFrame {
+    InventoryDashboardFrame inventoryDashboardFrame;
     private DefaultTableModel tableModel;
+    QuerySelector querySelector;
     /**
      * Creates new form NewJFrame
      */
-    public DaftarPO() {
-        this.setUndecorated(true);
-        this.setAlwaysOnTop(true);
+    public DaftarPO(InventoryDashboardFrame inventoryDashboardFrame) {
+        this.inventoryDashboardFrame = inventoryDashboardFrame;
         
         initComponents();
         this.setLocationRelativeTo(null);
+        setTitle("Toko Buku - Daftar Purchase Order");
+        
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                int option = JOptionPane.showConfirmDialog(
+                        DaftarPO.this,
+                        "Apakah Kamu Yakin Ingin Keluar?",
+                        "Konfirmasi Keluar", JOptionPane.YES_NO_OPTION);
+                if(option == JOptionPane.YES_OPTION){
+                    DaftarPO.this.setVisible(false);
+                    inventoryDashboardFrame.setEnabled(true);
+                    inventoryDashboardFrame.requestFocus();
+                } else {
+                    DaftarPO.this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                }
+            }
+        });
         
         setHeaderTable();
     }
@@ -34,7 +57,7 @@ public class DaftarPO extends javax.swing.JFrame {
         POTabel.setAutoResizeMode(POTabel.AUTO_RESIZE_OFF);
         
         column = POTabel.getColumnModel().getColumn(0); //nota
-        column.setPreferredWidth(120);
+        column.setPreferredWidth(150);
         column = POTabel.getColumnModel().getColumn(1); //id pegawai
         column.setPreferredWidth(120);
         column = POTabel.getColumnModel().getColumn(2); // nama pegawai
@@ -42,43 +65,41 @@ public class DaftarPO extends javax.swing.JFrame {
         column = POTabel.getColumnModel().getColumn(3); // isbn
         column.setPreferredWidth(120);
         column = POTabel.getColumnModel().getColumn(4); // judul buku
-        column.setPreferredWidth(200);
+        column.setPreferredWidth(250);
         column = POTabel.getColumnModel().getColumn(5); // id vendor
-        column.setPreferredWidth(120);
+        column.setPreferredWidth(150);
         column = POTabel.getColumnModel().getColumn(6); // nama vendor
-        column.setPreferredWidth(200);
+        column.setPreferredWidth(250);
         column = POTabel.getColumnModel().getColumn(7); // tanggal PO
-        column.setPreferredWidth(100);
-        column = POTabel.getColumnModel().getColumn(7); // Estimasi Tiba
-        column.setPreferredWidth(100);
-        column = POTabel.getColumnModel().getColumn(8); // Jumlah PO
-        column.setPreferredWidth(100);
-        column = POTabel.getColumnModel().getColumn(9); // Total Biaya
         column.setPreferredWidth(200);
-        column = POTabel.getColumnModel().getColumn(10); // Status PO
+        column = POTabel.getColumnModel().getColumn(8); // Estimasi Tiba
         column.setPreferredWidth(100);
+        column = POTabel.getColumnModel().getColumn(9); // Jumlah PO
+        column.setPreferredWidth(200);
+        column = POTabel.getColumnModel().getColumn(10); // Total Biaya
+        column.setPreferredWidth(120);
     }
     
     private void getDataTable(){
-        QuerySelector querySelector = new QuerySelector();
+        this.querySelector = new QuerySelector();
 
         try{
-            querySelector.getAllDataPo();
-
-            while(querySelector.getRslt().next()){
+            querySelector.selectAllPurchaseOrder();            
+            
+            while(querySelector.getResultSet().next()){
                 Object[] fieldx = new Object[12];
-                fieldx[0] = querySelector.getRslt().getString("nota_PO");
-                fieldx[1] = querySelector.getRslt().getString("id_pegawai");
-                fieldx[2] = querySelector.getRslt().getString("nama_pegawai");
-                fieldx[3] = querySelector.getRslt().getString("id_vendor");
-                fieldx[4] = querySelector.getRslt().getString("Nama_Vendor");
-                fieldx[5] = querySelector.getRslt().getString("isbn");
-                fieldx[6] = querySelector.getRslt().getString("judul_buku");
-                fieldx[7] = querySelector.getRslt().getString("tanggal_PO");
-                fieldx[8] = querySelector.getRslt().getString("estimasi_tanggal_datang");
-                fieldx[9] = querySelector.getRslt().getInt("jumlah_PO");
-                fieldx[10] = querySelector.getRslt().getDouble("total_biaya");
-                fieldx[11] = querySelector.getRslt().getString("status_PO");
+                fieldx[0] = querySelector.getResultSet().getString("nota_PO");
+                fieldx[1] = querySelector.getResultSet().getString("id_pegawai");
+                fieldx[2] = querySelector.getResultSet().getString("nama_pegawai");
+                fieldx[3] = querySelector.getResultSet().getString("id_vendor");
+                fieldx[4] = querySelector.getResultSet().getString("Nama_Vendor");
+                fieldx[5] = querySelector.getResultSet().getString("isbn");
+                fieldx[6] = querySelector.getResultSet().getString("judul_buku");
+                fieldx[7] = querySelector.getResultSet().getString("tanggal_PO");
+                fieldx[8] = querySelector.getResultSet().getString("estimasi_tanggal_datang");
+                fieldx[9] = querySelector.getResultSet().getInt("jumlah_PO");
+                fieldx[10] = querySelector.getResultSet().getDouble("total_biaya");
+                fieldx[11] = querySelector.getResultSet().getString("status_PO");
 
                 this.tableModel.addRow(fieldx);
             }
@@ -127,9 +148,8 @@ public class DaftarPO extends javax.swing.JFrame {
         CloseButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(720, 370));
 
-        jPanel1.setBackground(new java.awt.Color(102, 102, 255));
+        jPanel1.setBackground(new java.awt.Color(84, 119, 146));
         jPanel1.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 204), 3, true));
         jPanel1.setPreferredSize(new java.awt.Dimension(720, 370));
 
@@ -138,10 +158,7 @@ public class DaftarPO extends javax.swing.JFrame {
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel2.setText("Daftar Purchase Order");
 
-        POTabel.setBackground(new java.awt.Color(153, 153, 255));
-        POTabel.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 153), 1, true));
         POTabel.setFont(new java.awt.Font("Ebrima", 1, 14)); // NOI18N
-        POTabel.setForeground(new java.awt.Color(255, 255, 255));
         POTabel.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null, null, null, null, null, null, null},
@@ -156,7 +173,7 @@ public class DaftarPO extends javax.swing.JFrame {
         POTabel.setAlignmentY(1.0F);
         jScrollPane1.setViewportView(POTabel);
 
-        CloseButton.setBackground(new java.awt.Color(204, 0, 51));
+        CloseButton.setBackground(new java.awt.Color(33, 52, 72));
         CloseButton.setFont(new java.awt.Font("Ebrima", 1, 14)); // NOI18N
         CloseButton.setForeground(new java.awt.Color(255, 255, 255));
         CloseButton.setText("Keluar");
@@ -211,7 +228,8 @@ public class DaftarPO extends javax.swing.JFrame {
     private void CloseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CloseButtonActionPerformed
         if(JOptionPane.showConfirmDialog(this, "Apakah Kamu Yakin Ingin Keluar?", "Konfirmasi Keluar", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION){
             this.setVisible(false);
-            this.setFocusable(false);
+            inventoryDashboardFrame.setEnabled(true);
+            inventoryDashboardFrame.requestFocus();
         }
     }//GEN-LAST:event_CloseButtonActionPerformed
 

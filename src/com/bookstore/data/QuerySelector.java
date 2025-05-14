@@ -1,30 +1,30 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.bookstore.data;
 
 import java.math.BigDecimal;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.LocalDate;
 
 /**
- *
- * @author rifki
+ * Kelas ini digunakan untuk membuat dan menjalankan query database.
  */
-public class QuerySelector { // ini adalah class yang menyimpan kesemua query
-    private String queryCheck, queryInsert, queryUpdate, queryDelete; // atribut untuk menyimpan tiap jenis query
-    private MysqlConnection mysqlConnection; // koneksi ke databse
-    private PreparedStatement stmt; // prepared statement untuk mengeksekusi query
-    private ResultSet rslt; // untuk menampung hasil eksekusi statement
-    private int countData; // untuk menghitung berapa jumlah baris data
-    
-    // untuk mengambil semua data di tabel PO
-    public void getAllDataPo() throws ClassNotFoundException, SQLException{ 
-        this.mysqlConnection = new MysqlConnection();
-        this.queryCheck = 
+public class QuerySelector {
+    private MysqlConnection mysqlConnection;
+    private PreparedStatement preparedStatement;
+    private ResultSet resultSet;
+    private int affectedRows;
+
+    public QuerySelector() {
+        mysqlConnection = new MysqlConnection();
+    }
+
+    // ==================== SELECT ====================
+
+    /**
+     * Ambil semua data purchase order beserta nama pegawai, nama vendor, dan judul buku.
+     * Query ini menggunakan JOIN ke beberapa tabel untuk menampilkan data yang lengkap.
+     */
+    public void selectAllPurchaseOrder() throws ClassNotFoundException, SQLException {
+        String query =
             "SELECT " +
             "po.nota_PO, " +
             "po.id_pegawai, " +
@@ -41,246 +41,460 @@ public class QuerySelector { // ini adalah class yang menyimpan kesemua query
             "FROM T_PurchaseOrder po " +
             "JOIN T_AkunPegawai ap ON po.id_pegawai = ap.id_pegawai " +
             "JOIN T_MasterBuku mb ON po.isbn = mb.isbn " +
-            "JOIN T_Vendor v ON po.id_vendor = v.id_vendor";
+            "JOIN T_Vendor v ON po.id_vendor = v.id_vendor " +
+            "ORDER BY po.nota_PO ASC";
         
-        this.stmt = mysqlConnection.getConnection().prepareStatement(queryCheck);
-        this.rslt = stmt.executeQuery();
+        preparedStatement = mysqlConnection.getConnection().prepareStatement(query);
+        resultSet = preparedStatement.executeQuery();
     }
     
-    // untuk mengambil semua data di tabel Rak
-    public void getAllDataRack() throws ClassNotFoundException, SQLException{ 
-        this. mysqlConnection = new MysqlConnection();
+    public void selectPegawaiAndRole() throws ClassNotFoundException, SQLException {
+        String query =
+            "SELECT " +
+            "pg.id_pegawai, " +
+            "pg.nama, " +
+            "pg.password, " +
+            "pg.id_role, " +
+            "r.nama_role, " +
+            "pg.tanggal_buat_akun, " +
+            "pg.tanggal_terakhir_masuk_akun " +
+            "FROM T_AkunPegawai pg " +
+            "LEFT JOIN T_Role r ON pg.id_role = r.id_role " +
+            "ORDER BY pg.id_pegawai ASC";
         
-        this.queryCheck = "SELECT *FROM T_Rak";
-        this.stmt = mysqlConnection.getConnection().prepareStatement(queryCheck);
-        this.rslt = stmt.executeQuery();
+        preparedStatement = mysqlConnection.getConnection().prepareStatement(query);
+        resultSet = preparedStatement.executeQuery();
     }
     
-    // untuk mengambil semua data di tabel detail master buku jenis toko
-    public void getAllDataStock() throws ClassNotFoundException, SQLException{
-        this.mysqlConnection = new MysqlConnection();
+    // mengambil data pada tabel pegawai dan role
+    public void selectPegawaiAndRoleByRoleFilter(String roleName) throws ClassNotFoundException, SQLException {
+        String query =
+            "SELECT " +
+            "pg.id_pegawai, " +
+            "pg.nama, " +
+            "pg.password, " +
+            "pg.id_role, " +
+            "r.nama_role, " +
+            "pg.tanggal_buat_akun, " +
+            "pg.tanggal_terakhir_masuk_akun " +
+            "FROM T_AkunPegawai pg " +
+            "LEFT JOIN T_Role r ON pg.id_role = r.id_role " +
+            "WHERE r.nama_role = ? " +
+            "ORDER BY pg.id_pegawai ASC";
         
-        this.queryCheck = "SELECT *FROM T_DetailMasterbuku WHERE jenis_inventaris = ?";
-        this.stmt = mysqlConnection.getConnection().prepareStatement(queryCheck);
-        stmt.setString(1, "toko");
-        this.rslt = stmt.executeQuery();
+        preparedStatement = mysqlConnection.getConnection().prepareStatement(query);
+        preparedStatement.setString(1, roleName);
+        resultSet = preparedStatement.executeQuery();
+    }
+
+    public void selectDetailMasterBuku(String invType) throws ClassNotFoundException, SQLException {
+        String query =
+            "SELECT " +
+            "dm.id_detail_master_buku, " +
+            "dm.isbn, " +
+            "mb.judul_buku, " +
+            "dm.kode_rak, " +
+            "rk.nama_rak, " +
+            "dm.id_vendor, " +
+            "v.nama_vendor, " +
+            "dm.stock_buku, " +
+            "dm.tanggal_update_stock, " +
+            "dm.harga_satuan, " +
+            "dm.jenis_inventaris " +
+            "FROM " +
+            "T_Detailmasterbuku dm " +
+            "LEFT " +
+            "JOIN T_Masterbuku mb ON dm.isbn = mb.isbn " +
+            "JOIN T_Rak rk ON dm.kode_rak = rk.kode_rak " +
+            "JOIN T_Vendor v ON dm.id_vendor = v.id_vendor " +
+            "WHERE dm.jenis_inventaris = ? " +
+            "ORDER BY dm.id_detail_master_buku ASC";
+        
+        preparedStatement = mysqlConnection.getConnection().prepareStatement(query);
+        preparedStatement.setString(1, invType);
+        resultSet = preparedStatement.executeQuery();
     }
     
-    //untuk mengambil semua data di tabel detail master buku jenis vendor
-    public void getAllDataVendorStock() throws ClassNotFoundException, SQLException{
-       this.mysqlConnection = new MysqlConnection();
+    public void selectDetailMasterBukuByVendorFilter(String vendorName, String invType) throws ClassNotFoundException, SQLException {
+        String query =
+            "SELECT " +
+            "dm.id_detail_master_buku, " +
+            "dm.isbn, " +
+            "mb.judul_buku, " +
+            "dm.kode_rak, " +
+            "rk.nama_rak, " +
+            "dm.id_vendor, " +
+            "v.nama_vendor, " +
+            "dm.stock_buku, " +
+            "dm.tanggal_update_stock, " +
+            "dm.harga_satuan, " +
+            "dm.jenis_inventaris " +
+            "FROM " +
+            "T_Detailmasterbuku dm " +
+            "LEFT " +
+            "JOIN T_Masterbuku mb ON dm.isbn = mb.isbn " +
+            "JOIN T_Rak rk ON dm.kode_rak = rk.kode_rak " +
+            "JOIN T_Vendor v ON dm.id_vendor = v.id_vendor " +
+            "WHERE dm.jenis_inventaris = ? AND v.nama_vendor = ? " +
+            "ORDER BY dm.id_detail_master_buku ASC";
         
-        this.queryCheck = "SELECT *FROM T_DetailMasterbuku WHERE jenis_inventaris = ?";
-        this.stmt = mysqlConnection.getConnection().prepareStatement(queryCheck);
-        stmt.setString(1, "vendor");
-        this.rslt = stmt.executeQuery();
+        preparedStatement = mysqlConnection.getConnection().prepareStatement(query);
+        preparedStatement.setString(1, invType);
+        preparedStatement.setString(2, vendorName);
+        resultSet = preparedStatement.executeQuery();
     }
     
-    // untuk menghitung data yang tersedia
-    public void getCountRowData(String data_reference, String table, String column) throws SQLException, ClassNotFoundException{ 
-        this.mysqlConnection = new MysqlConnection();
-        
-        this.queryCheck = "SELECT COUNT(*) FROM " + table + " WHERE " + column + " = ?";
-        this.stmt = mysqlConnection.getConnection().prepareStatement(queryCheck);
-        stmt.setString(1, data_reference);
-        this.rslt = stmt.executeQuery();
-        
-        rslt.next();
-        this.countData = rslt.getInt(1);
+    /**
+     * Ambil semua data dari sebuah tabel.
+     */
+    public void selectAllFromTable(String tableName) throws SQLException, ClassNotFoundException {
+        String query = "SELECT * FROM " + tableName + " ORDER BY 1 ASC";
+        preparedStatement = mysqlConnection.getConnection().prepareStatement(query);
+        resultSet = preparedStatement.executeQuery();
     }
 
-    // untuk menghapus 1 buah baris data pada tabel
-    public void deleteRowData(String data_reference, String table, String column) throws ClassNotFoundException, SQLException{
-        this.mysqlConnection = new MysqlConnection();
-        
-        this.queryDelete = "DELETE FROM " + table + " WHERE " + column + " = ?";
-        this.stmt = mysqlConnection.getConnection().prepareStatement(queryDelete);
-        
-        stmt.setString(1, data_reference);
-        this.countData = stmt.executeUpdate();
+    /**
+     * Ambil semua data dari tabel berdasarkan satu nilai kolom.
+     */
+    public void selectAllByColumn(String tableName, String columnName, String columnValue) throws SQLException, ClassNotFoundException {
+        String query = "SELECT * FROM " + tableName + " WHERE " + columnName + " = ? ORDER BY 1 ASC";
+        preparedStatement = mysqlConnection.getConnection().prepareStatement(query);
+        preparedStatement.setString(1, columnValue);
+        resultSet = preparedStatement.executeQuery();
     }
     
-    //untuk  melakukan update data pada tabel dengan 3 kolom
-    public void updateRowDataWith3Columns(String data_reference, String data1, String data2, String table, String column_reference, String column2, String column3) throws SQLException, ClassNotFoundException{
-        this.mysqlConnection = new MysqlConnection();
-        
-        this.queryInsert = "UPDATE " + table + " SET " + column2 + " = ?, " + column3 + " = ? WHERE " + column_reference + " = ?";
-        this.stmt = mysqlConnection.getConnection().prepareStatement(queryInsert);
-        
-        stmt.setString(1, data1);
-        stmt.setString(2, data2);
-        stmt.setString(3, data_reference);
-        this.countData = stmt.executeUpdate();
+    // untuk menampilkan semua data dari tabel berdasarkan 2 nilai kolom
+    public void selectAllByTwoColumns(String tableName, String column1, String value1, String column2, String value2) throws SQLException, ClassNotFoundException {
+        String query = "SELECT * FROM " + tableName + " WHERE " + column1 + " = ? AND " + column2 + " = ? ORDER BY 1 ASC";
+        preparedStatement = mysqlConnection.getConnection().prepareStatement(query);
+        preparedStatement.setString(1, value1);
+        preparedStatement.setString(2, value2);
+        resultSet = preparedStatement.executeQuery();
     }
     
-    // menambahkan data ke tabel dengan 3 kolom
-    public void insertRowDataWith3Columns(String data1, String data2, String data3, String table, String column1, String column2, String column3) throws ClassNotFoundException, SQLException{
-        this.mysqlConnection = new MysqlConnection();
-        
-        this.queryInsert = "INSERT INTO " + table + "(" + column1 + ", " + column2 + ", " + column3 + ") values(?, ?, ?)";
-        this.stmt = mysqlConnection.getConnection().prepareStatement(queryInsert);
-        stmt.setString(1, data1);
-        stmt.setString(2, data2);
-        stmt.setString(3, data3);
-        this.countData = stmt.executeUpdate();
+    // untuk menampilkan 1 kolom berdasarkan kolom tertentu di tabel
+    public void selectOneColumnByOneKey(String selectedColumn, String tableName, String columnName, String columnValue) throws SQLException, ClassNotFoundException {
+        String query = "SELECT " + selectedColumn + " FROM " + tableName + " WHERE " + columnName + " = ? ORDER BY 1 ASC";
+        preparedStatement = mysqlConnection.getConnection().prepareStatement(query);
+        preparedStatement.setString(1, columnValue);
+        resultSet = preparedStatement.executeQuery();
     }
     
-    // Mengecek kecocokan id_pegawai dan password lama
-    public ResultSet checkPassword(String idPegawai, String password) throws SQLException, ClassNotFoundException {
-        this.mysqlConnection = new MysqlConnection();
-        this.queryCheck = "SELECT * FROM T_AkunPegawai WHERE id_pegawai = ? AND password = ?";
-        this.stmt = mysqlConnection.getConnection().prepareStatement(queryCheck);
-        stmt.setString(1, idPegawai);
-        stmt.setString(2, password);
-        this.rslt = stmt.executeQuery();
-        return rslt;
+    // untuk menampilkan 1 kolom berdasarkan kolom tertentu di tabel
+    public void selectOneColumnByTwoKeys(String selectedColumn, String tableName, String column1, String value1, String column2, String value2) throws SQLException, ClassNotFoundException {
+        String query = "SELECT " + selectedColumn + " FROM " + tableName + " WHERE " + column1 + " = ? AND " + column2 + " = ? ORDER BY 1 ASC";
+        preparedStatement = mysqlConnection.getConnection().prepareStatement(query);
+        preparedStatement.setString(1, value1);
+        preparedStatement.setString(2, value2);
+        resultSet = preparedStatement.executeQuery();
     }
-
-    // Melakukan update password
-    public int updatePassword(String idPegawai, String newPassword) throws SQLException, ClassNotFoundException {
-        this.mysqlConnection = new MysqlConnection();
-        this.queryUpdate = "UPDATE T_AkunPegawai SET password = ? WHERE id_pegawai = ?";
-        this.stmt = mysqlConnection.getConnection().prepareStatement(queryUpdate);
-        stmt.setString(1, newPassword);
-        stmt.setString(2, idPegawai);
-        return stmt.executeUpdate();
-    }
-
-    // untuk search field
-    public void searchBookDetail(String keyword, String jenisInventaris) throws SQLException, ClassNotFoundException {
-        this.mysqlConnection = new MysqlConnection();
-
-        this.queryCheck = "SELECT * FROM T_DetailMasterbuku WHERE (isbn LIKE ? OR judul_buku LIKE ?) AND jenis_inventaris = ?";
-        this.stmt = mysqlConnection.getConnection().prepareStatement(queryCheck);
-        stmt.setString(1, "%" + keyword + "%");
-        stmt.setString(2, "%" + keyword + "%");
-        stmt.setString(3, jenisInventaris);
-
-        this.rslt = stmt.executeQuery();
-    }
-
-    //untuk mendapatkan semua nama dari vendor
-    public void getAllVendor() throws SQLException, ClassNotFoundException {
-        this.mysqlConnection = new MysqlConnection();
+    
+    // untuk menampilkan 2 kolom berdasarkan 3 nilai kolom tertentu di tabel
+    public void selectTwoColumnsByThreeKeys(String selectedColumn1, String selectedColumn2, String tableName, String column1, String value1, String column2, String value2, String column3, String value3) throws SQLException, ClassNotFoundException {
+        String query = "SELECT " + selectedColumn1 + ", " + selectedColumn2 + " FROM " + tableName + " WHERE " + column1 + " = ? AND " + column2 + " = ? AND " + column3 + " = ? ORDER BY 1 ASC";
+        preparedStatement = mysqlConnection.getConnection().prepareStatement(query);
+        preparedStatement.setString(1, value1);
+        preparedStatement.setString(2, value2);
+        preparedStatement.setString(3, value3);
+        resultSet = preparedStatement.executeQuery();
         
-        this.queryCheck = "SELECT * FROM T_Vendor";
-        this.stmt = mysqlConnection.getConnection().prepareStatement(queryCheck);
-        this.rslt = stmt.executeQuery();
+        System.out.println("DEBUG SQL: SELECT " + selectedColumn1 + ", " + selectedColumn2 +
+                   " FROM " + tableName +
+                   " WHERE " + column1 + " = '" + value1 +
+                   "' AND " + column2 + " = '" + value2 +
+                   "' AND " + column3 + " = '" + value3 + "'");
+
     }
 
-    // untuk menambahkan data ke PO
-    public void insertPurchaseOrder(String notaPO, String idPegawai, String idVendor, String isbn, LocalDate tanggalPO, LocalDate estimasiDatang, int jumlahPO, BigDecimal totalBiaya, String statusPO)
-        throws SQLException, ClassNotFoundException {
+    // =========================== COUNT ===============================
+    
+    /**
+     * Hitung jumlah data berdasarkan satu kolom dan nilainya.
+     */
+    public void countDataByColumn(String tableName, String columnName, String columnValue) throws SQLException, ClassNotFoundException {
+        String query = "SELECT COUNT(*) FROM " + tableName + " WHERE " + columnName + " = ?";
+        preparedStatement = mysqlConnection.getConnection().prepareStatement(query);
+        preparedStatement.setString(1, columnValue);
+        resultSet = preparedStatement.executeQuery();
+        if (resultSet.next()) {
+            affectedRows = resultSet.getInt(1);
+        }
+    }
+    
+    // ========================== LIKE ===============================
+    
+        // untuk melakukan pencarian 1 nilai secara dinamis perhuruf
+    public void selectAllByColumnsLike(String tableName, String column1, String value1) throws SQLException, ClassNotFoundException {
+        String query = "SELECT * FROM " + tableName + " WHERE " + column1 + " LIKE ?";
+        preparedStatement = mysqlConnection.getConnection().prepareStatement(query);
+        preparedStatement.setString(1, "%" + value1 + "%");
 
+        resultSet = preparedStatement.executeQuery();
+    }
+    
+    public void selectLikeNoJoin(String tableName, String col1, String col2, String val) throws SQLException, ClassNotFoundException {
+        String query = "SELECT * FROM " + tableName +
+                       " WHERE " + col1 + " LIKE ? OR " + col2 + " LIKE ?";
+
+        preparedStatement = mysqlConnection.getConnection().prepareStatement(query);
+        preparedStatement.setString(1, "%" + val + "%");
+        preparedStatement.setString(2, "%" + val + "%");
+
+        resultSet = preparedStatement.executeQuery();
+    }
+    
+    public void selectLikeAndFilterNoJoin(String tableName, String col1, String col2, String val, String col3, String val3) throws SQLException, ClassNotFoundException {
+        String query = "SELECT * FROM " + tableName +
+                       " WHERE (" + col1 + " LIKE ? OR " + col2 + " LIKE ?) AND " + col3 + " = ?";
+
+        preparedStatement = mysqlConnection.getConnection().prepareStatement(query);
+        preparedStatement.setString(1, "%" + val + "%");
+        preparedStatement.setString(2, "%" + val + "%");
+        preparedStatement.setString(3, val3);
+
+        resultSet = preparedStatement.executeQuery();
+    }
+    
+    // =================== JOIN =======================
+    
+    // akun pegawai
+    public void selectLikeWithJoinAkunPegawai(String col1, String col2, String val) throws SQLException, ClassNotFoundException {
+        String query = "SELECT " +
+                       "pg.id_pegawai, pg.nama, pg.password, pg.id_role, r.nama_role AS Nama_Role, " +
+                       "pg.tanggal_buat_akun, pg.tanggal_terakhir_masuk_akun " +
+                       "FROM T_AkunPegawai pg " +
+                       "LEFT JOIN T_Role r ON pg.id_role = r.id_role " +
+                       "WHERE pg." + col1 + " LIKE ? OR pg." + col2 + " LIKE ? " +
+                       "ORDER BY pg.id_pegawai ASC";
+
+        preparedStatement = mysqlConnection.getConnection().prepareStatement(query);
+        preparedStatement.setString(1, "%" + val + "%");
+        preparedStatement.setString(2, "%" + val + "%");
+
+        resultSet = preparedStatement.executeQuery();
+    }
+    
+    public void selectLikeWithJoinAndFilterAkunPegawai(String col1, String col2, String val, String col3, String val3) throws SQLException, ClassNotFoundException {
+        String query = "SELECT " +
+                       "pg.id_pegawai, pg.nama, pg.password, pg.id_role, r.nama_role, " +
+                       "pg.tanggal_buat_akun, pg.tanggal_terakhir_masuk_akun " +
+                       "FROM T_AkunPegawai pg " +
+                       "LEFT JOIN T_Role r ON pg.id_role = r.id_role " +
+                       "WHERE (pg." + col1 + " LIKE ? OR pg." + col2 + " LIKE ?) AND pg." + col3 + " = ? " +
+                       "ORDER BY pg.id_pegawai ASC";
+
+        preparedStatement = mysqlConnection.getConnection().prepareStatement(query);
+        preparedStatement.setString(1, "%" + val + "%");
+        preparedStatement.setString(2, "%" + val + "%");
+        preparedStatement.setString(3, val3);
+
+        resultSet = preparedStatement.executeQuery();
+    }
+    
+    // detailmasterbuku
+    public void selectLikeWithJoinDetailMasterBuku(String col1, String col2, String val, String invType) throws SQLException, ClassNotFoundException {
+        String query =
+            "SELECT " +
+            "dm.id_detail_master_buku, dm.isbn, mb.judul_buku, " +
+            "dm.kode_rak, rk.nama_rak, " +
+            "dm.id_vendor, v.nama_vendor, " +
+            "dm.stock_buku, dm.tanggal_update_stock, " +
+            "dm.harga_satuan, dm.jenis_inventaris " +
+            "FROM T_Detailmasterbuku dm " +
+            "LEFT JOIN T_Masterbuku mb ON dm.isbn = mb.isbn " +
+            "LEFT JOIN T_Rak rk ON dm.kode_rak = rk.kode_rak " +
+            "LEFT JOIN T_Vendor v ON dm.id_vendor = v.id_vendor " +
+            "WHERE (dm." + col1 + " LIKE ? OR mb." + col2 + " LIKE ?) " +
+            "AND dm.jenis_inventaris = ? " +
+            "ORDER BY dm.id_detail_master_buku ASC";
+
+        preparedStatement = mysqlConnection.getConnection().prepareStatement(query);
+        preparedStatement.setString(1, "%" + val + "%");
+        preparedStatement.setString(2, "%" + val + "%");
+        preparedStatement.setString(3, invType);
+
+        resultSet = preparedStatement.executeQuery();
+    }
+    
+    public void selectLikeWithJoinAndFilterDetailMasterBuku(String col1, String col2, String val, String col3, String val3, String invType) throws SQLException, ClassNotFoundException {
+        String query =
+            "SELECT " +
+            "dm.id_detail_master_buku, dm.isbn, mb.judul_buku, " +
+            "dm.kode_rak, rk.nama_rak, " +
+            "dm.id_vendor, v.nama_vendor, " +
+            "dm.stock_buku, dm.tanggal_update_stock, " +
+            "dm.harga_satuan, dm.jenis_inventaris " +
+            "FROM T_Detailmasterbuku dm " +
+            "LEFT JOIN T_Masterbuku mb ON dm.isbn = mb.isbn " +
+            "LEFT JOIN T_Rak rk ON dm.kode_rak = rk.kode_rak " +
+            "LEFT JOIN T_Vendor v ON dm.id_vendor = v.id_vendor " +
+            "WHERE (dm." + col1 + " LIKE ? OR mb." + col2 + " LIKE ?) AND dm." + col3 + " = ? " +
+            "AND dm.jenis_inventaris = ? " +
+            "ORDER BY dm.id_detail_master_buku ASC";
+
+        preparedStatement = mysqlConnection.getConnection().prepareStatement(query);
+        preparedStatement.setString(1, "%" + val + "%");
+        preparedStatement.setString(2, "%" + val + "%");
+        preparedStatement.setString(3, val3);
+        preparedStatement.setString(4, invType);
+
+        resultSet = preparedStatement.executeQuery();
+    }
+
+    // ==================== INSERT ====================
+
+    // menambahkan PO setelah check ketersediaan PO
+    public void insertPurchaseOrder(String purchaseOrderNumber, String employeeId, String vendorId, String isbn, LocalDate purchaseDate, LocalDate estimatedArrivalDate, int orderQuantity, BigDecimal totalCost, String orderStatus) throws SQLException, ClassNotFoundException {
         this.mysqlConnection = new MysqlConnection();
 
-        this.queryInsert = "INSERT INTO t_purchaseorder " +
+        String query  = "INSERT INTO t_purchaseorder " +
                            "(nota_PO, id_pegawai, id_vendor, isbn, tanggal_po, estimasi_tanggal_datang, jumlah_po, total_biaya, status_po) " +
                            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        this.stmt = mysqlConnection.getConnection().prepareStatement(queryInsert);
-        stmt.setString(1, notaPO);
-        stmt.setString(2, idPegawai);
-        stmt.setString(3, idVendor);
-        stmt.setString(4, isbn);
-        stmt.setDate(5, java.sql.Date.valueOf(tanggalPO));
-        stmt.setDate(6, java.sql.Date.valueOf(estimasiDatang));
-        stmt.setInt(7, jumlahPO);
-        stmt.setBigDecimal(8, totalBiaya);
-        stmt.setString(9, statusPO);
+        this.preparedStatement = mysqlConnection.getConnection().prepareStatement(query);
+        preparedStatement.setString(1, purchaseOrderNumber);
+        preparedStatement.setString(2, employeeId);
+        preparedStatement.setString(3, vendorId);
+        preparedStatement.setString(4, isbn);
+        preparedStatement.setDate(5, java.sql.Date.valueOf(purchaseDate));
+        preparedStatement.setDate(6, java.sql.Date.valueOf(estimatedArrivalDate));
+        preparedStatement.setInt(7, orderQuantity);
+        preparedStatement.setBigDecimal(8, totalCost);
+        preparedStatement.setString(9, orderStatus);
 
-        this.countData = stmt.executeUpdate(); // untuk menyimpan status eksekusi (jumlah baris terpengaruh)
-    }
-
-    // untuk mendapatkan id vebdor berdasarkan nama vendor
-    public String getIdVendorByName(String vendorName) throws SQLException, ClassNotFoundException {
-        this.mysqlConnection = new MysqlConnection();
-        
-        this.queryCheck = "SELECT id_vendor FROM t_detailmasterbuku WHERE nama_vendor = ? LIMIT 1";
-        this.stmt = mysqlConnection.getConnection().prepareStatement(queryCheck);
-        stmt.setString(1, vendorName);
-        this.rslt = stmt.executeQuery();
-
-        if (rslt.next()) {
-            return rslt.getString("id_vendor");
-        } else {
-            return null;
-        }
+        this.affectedRows = preparedStatement.executeUpdate(); // untuk menyimpan status eksekusi (jumlah baris terpengaruh)
     }
     
-    // untuk mendapatkan stock saat ini di gudang vendor
-    public int getCurrentStock(String isbn, String idVendor) throws SQLException, ClassNotFoundException {
-        this.mysqlConnection = new MysqlConnection();
-        
-        this.queryCheck = "SELECT stock_buku FROM t_detailmasterbuku WHERE isbn = ? AND id_vendor = ?";
-        this.stmt = mysqlConnection.getConnection().prepareStatement(queryCheck);
-        stmt.setString(1, isbn);
-        stmt.setString(2, idVendor);
-        this.rslt = stmt.executeQuery();
-
-        if (rslt.next()) {
-            return rslt.getInt("stock_buku");
-        } else {
-            return -1; // menandakan tidak ditemukan
-        }
+    /**
+     * Tambah data dengan 2 kolom.
+     */
+    public void insertTwoColumns(String tableName, String column1, String column2, String value1, String value2) throws SQLException, ClassNotFoundException {
+        String query = "INSERT INTO " + tableName + " (" + column1 + ", " + column2 + ") VALUES (?, ?)";
+        preparedStatement = mysqlConnection.getConnection().prepareStatement(query);
+        preparedStatement.setString(1, value1);
+        preparedStatement.setString(2, value2);
+        affectedRows = preparedStatement.executeUpdate();
     }
 
-    // untuk update stock milik vendor
-    public void updateStock(String isbn, String idVendor, int newStock) throws SQLException, ClassNotFoundException {
-        this.mysqlConnection = new MysqlConnection();
-        this.queryUpdate = "UPDATE t_detailmasterbuku SET stock_buku = ?, tanggal_update_stock = NOW() WHERE isbn = ? AND id_vendor = ?";
-        this.stmt = mysqlConnection.getConnection().prepareStatement(queryUpdate);
-        stmt.setInt(1, newStock);
-        stmt.setString(2, isbn);
-        stmt.setString(3, idVendor);
-        this.countData = stmt.executeUpdate();
+    /**
+     * Tambah data dengan 3 kolom.
+     */
+    public void insertThreeColumns(String tableName, String column1, String column2, String column3, String value1, String value2, String value3) throws SQLException, ClassNotFoundException {
+        String query = "INSERT INTO " + tableName + " (" + column1 + ", " + column2 + ", " + column3 + ") VALUES (?, ?, ?)";
+        preparedStatement = mysqlConnection.getConnection().prepareStatement(query);
+        preparedStatement.setString(1, value1);
+        preparedStatement.setString(2, value2);
+        preparedStatement.setString(3, value3);
+        affectedRows = preparedStatement.executeUpdate();
     }
 
-    // untuk mendapatkan stock dan harga tiap produk PO
-    public int getStockAndPrice(String isbn, String idVendor) throws SQLException, ClassNotFoundException {
-        this.mysqlConnection = new MysqlConnection();
-        this.queryCheck = "SELECT stock_buku, harga_satuan FROM t_detailmasterbuku WHERE isbn = ? AND id_vendor = ? AND jenis_inventaris = ?";
-        this.stmt = mysqlConnection.getConnection().prepareStatement(queryCheck);
-        stmt.setString(1, isbn);
-        stmt.setString(2, idVendor);
-        stmt.setString(3, "vendor");
-        this.rslt = stmt.executeQuery();
-
-        if (rslt.next()) {
-            int stock = rslt.getInt("stock_buku");
-            BigDecimal hargaSatuan = rslt.getBigDecimal("harga_satuan");
-            return stock;
-        }
-        return -1; // menandakan buku tidak ditemukan
-    }
-
-    // untuk mendapatkan harga satuan dari buku
-    public BigDecimal getHargaSatuan(String isbn, String idVendor) throws SQLException, ClassNotFoundException {
-        this.mysqlConnection = new MysqlConnection();
-        this.queryCheck = "SELECT harga_satuan FROM t_detailmasterbuku WHERE isbn = ? AND id_vendor = ? AND jenis_inventaris = ?";
-        this.stmt = mysqlConnection.getConnection().prepareStatement(queryCheck);
-        stmt.setString(1, isbn);
-        stmt.setString(2, idVendor);
-        stmt.setString(3, "vendor");
-        this.rslt = stmt.executeQuery();
-
-        if (rslt.next()) {
-            return rslt.getBigDecimal("harga_satuan");
-        } else {
-            return BigDecimal.ZERO; // Mengembalikan harga 0 jika tidak ditemukan
-        }
-    }
-
-    
-    // untuk mengembalikan nilai hasil query
-    public ResultSet getRslt() {
-        return rslt;
-    }
-
-    // untuk mengembalikan jumlah baris data yang di hitung
-    public int getCountData() {
-        return countData;
+    /**
+     * Tambah data dengan 4 kolom.
+     */
+    public void insertFourColumns(String tableName, String column1, String column2, String column3, String column4, String value1, String value2, String value3, String value4) throws SQLException, ClassNotFoundException {
+        String query = "INSERT INTO " + tableName + " (" + column1 + ", " + column2 + ", " + column3 + ", " + column4 + ") VALUES (?, ?, ?, ?)";
+        preparedStatement = mysqlConnection.getConnection().prepareStatement(query);
+        preparedStatement.setString(1, value1);
+        preparedStatement.setString(2, value2);
+        preparedStatement.setString(3, value3);
+        preparedStatement.setString(4, value4);
+        affectedRows = preparedStatement.executeUpdate();
     }
     
+    public void setInsert5Columns(String table, String col1, String col2, String col3, String col4, String col5, String val1, String val2, String val3, String val4, String val5) throws SQLException, ClassNotFoundException {
+        String query = "INSERT INTO " + table + " (" + col1 + ", " + col2 + ", " + col3 + ", " + col4 + ", " + col5 + ") VALUES (?, ?, ?, ?, ?)";
+        preparedStatement = mysqlConnection.getConnection().prepareStatement(query);
+        preparedStatement.setString(1, val1);
+        preparedStatement.setString(2, val2);
+        preparedStatement.setString(3, val3);
+        preparedStatement.setString(4, val4);
+        preparedStatement.setString(5, val5);
+        affectedRows = preparedStatement.executeUpdate();
+    }
+
+
+    // ==================== UPDATE ====================
+
+    /**
+     * Ubah data pada 1 kolom berdasarkan kondisi satu kolom.
+     */
+    public void updateOneColumn(String tableName, String column1, String value1, String column2, String value2) throws SQLException, ClassNotFoundException {
+        String query = "UPDATE " + tableName + " SET " + column1 + " = ? WHERE " + column2 + " = ?";
+        preparedStatement = mysqlConnection.getConnection().prepareStatement(query);
+        preparedStatement.setString(1, value1);
+        preparedStatement.setString(2, value2);
+        affectedRows = preparedStatement.executeUpdate();
+    }
+
+    /**
+     * Ubah data pada 2 kolom berdasarkan kondisi satu kolom.
+     */
+    public void updateTwoColumns(String tableName, String column1, String value1, String column2, String value2, String conditionColumn, String conditionValue) throws SQLException, ClassNotFoundException {
+        String query = "UPDATE " + tableName + " SET " + column1 + " = ?, " + column2 + " = ? WHERE " + conditionColumn + " = ?";
+        preparedStatement = mysqlConnection.getConnection().prepareStatement(query);
+        preparedStatement.setString(1, value1);
+        preparedStatement.setString(2, value2);
+        preparedStatement.setString(3, conditionValue);
+        affectedRows = preparedStatement.executeUpdate();
+    }
+
+    /**
+     * Ubah data pada 3 kolom berdasarkan kondisi satu kolom.
+     */
+    public void updateThreeColumns(String tableName, String column1, String value1, String column2, String value2, String column3, String value3, String conditionColumn, String conditionValue) throws SQLException, ClassNotFoundException {
+        String query = "UPDATE " + tableName + " SET " + column1 + " = ?, " + column2 + " = ?, " + column3 + " = ? WHERE " + conditionColumn + " = ?";
+        preparedStatement = mysqlConnection.getConnection().prepareStatement(query);
+        preparedStatement.setString(1, value1);
+        preparedStatement.setString(2, value2);
+        preparedStatement.setString(3, value3);
+        preparedStatement.setString(4, conditionValue);
+        affectedRows = preparedStatement.executeUpdate();
+    }
     
+    // untuk update data stock dan tanggal update stock
+    public void updateStockAndDate(String tableName, String column1, int value1, String column2, Date value2, String conditionColumn1, String conditionValue1, String conditionColumn2, String conditionValue2) throws SQLException, ClassNotFoundException {
+        String query = "UPDATE " + tableName + " SET " + column1 + " = ?, " + column2 + " = ? WHERE " + conditionColumn1 + " = ? AND " + conditionColumn2 + " = ?";
+        preparedStatement = mysqlConnection.getConnection().prepareStatement(query);
+        preparedStatement.setInt(1, value1);
+        preparedStatement.setDate(2, value2);
+        preparedStatement.setString(3, conditionValue1);
+        preparedStatement.setString(4, conditionValue2);
+        affectedRows = preparedStatement.executeUpdate();
+    }
+    
+    // untuk mengubah data yang berelasi menjadi null
+    public void setColumnToNullByCondition(String tableName, String targetColumn, String conditionColumn, String conditionValue) throws SQLException, ClassNotFoundException {
+        String query = "UPDATE " + tableName + " SET " + targetColumn + " = NULL WHERE " + conditionColumn + " = ?";
+        preparedStatement = mysqlConnection.getConnection().prepareStatement(query);
+        preparedStatement.setString(1, conditionValue);
+        affectedRows = preparedStatement.executeUpdate();
+    }
+
+    // ==================== DELETE ====================
+
+    /**
+     * Hapus data dari tabel berdasarkan satu kolom.
+     */
+    public void deleteByKey(String tableName, String columnName, String columnValue) throws SQLException, ClassNotFoundException {
+        String query = "DELETE FROM " + tableName + " WHERE " + columnName + " = ?";
+        preparedStatement = mysqlConnection.getConnection().prepareStatement(query);
+        preparedStatement.setString(1, columnValue);
+        affectedRows = preparedStatement.executeUpdate();
+    }
+
+    // ==================== GETTER ====================
+
+    /**
+     * Ambil hasil SELECT.
+     */
+    public ResultSet getResultSet() {
+        return resultSet;
+    }
+
+    /**
+     * Ambil hasil COUNT, INSERT, UPDATE, DELETE.
+     */
+    public int getAffectedRows() {
+        return affectedRows;
+    }
 }

@@ -4,11 +4,14 @@
  */
 package com.bookstore.ui;
 
-import com.bookstore.ui.menu.ChangePassword;
-import com.bookstore.ui.menu.DaftarPO;
-import com.bookstore.ui.menu.POManagement;
-import com.bookstore.ui.menu.RackConfig;
-import com.bookstore.ui.menu.StockBook;
+import com.bookstore.ui.inventory_menu.ChangePassword;
+import com.bookstore.ui.inventory_menu.DaftarPO;
+import com.bookstore.ui.inventory_menu.CreatePurchaseOrder;
+import com.bookstore.ui.inventory_menu.RackConfig;
+import com.bookstore.ui.inventory_menu.StockBook;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 /**
@@ -16,16 +19,33 @@ import javax.swing.JOptionPane;
  * @author rifki
  */
 public class InventoryDashboardFrame extends javax.swing.JFrame {
-
     /**
      * Creates new form InventoryDashboardFrame
      */
     public InventoryDashboardFrame() {
-        this.setUndecorated(true);
-        this.setAlwaysOnTop(true);
-        
+       
         initComponents();
         this.setLocationRelativeTo(null);
+        setTitle("Toko Buku - Admin Gudang");
+        
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                int option = JOptionPane.showConfirmDialog(
+                        InventoryDashboardFrame.this,
+                        "Apakah Kamu Yakin Ingin Keluar Dari Aplikasi?",
+                        "Konfirmasi Keluar", JOptionPane.YES_NO_OPTION);
+                if(option == JOptionPane.YES_OPTION){
+                    InventoryDashboardFrame.this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                    InventoryDashboardFrame.this.setVisible(false);
+                    LoginFrame loginFrame = new LoginFrame();
+                    loginFrame.setVisible(true);
+                    loginFrame.requestFocus();
+                } else {
+                    InventoryDashboardFrame.this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                }
+            }
+        });
     }
 
     /**
@@ -48,18 +68,21 @@ public class InventoryDashboardFrame extends javax.swing.JFrame {
         jMenu3 = new javax.swing.JMenu();
         CreatePOMenu = new javax.swing.JMenuItem();
         CheckPOMenu = new javax.swing.JMenuItem();
-        jMenu4 = new javax.swing.JMenu();
-        jMenuItem8 = new javax.swing.JMenuItem();
+        jMenuItem1 = new javax.swing.JMenuItem();
         jMenu5 = new javax.swing.JMenu();
         jMenuItem9 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(1200, 600));
 
         jLabel1.setIcon(new javax.swing.ImageIcon("D:\\User\\Documents\\kuliah\\semester4\\pemrograman_desktop\\project\\toko_buku\\Fix_Tubes\\assets\\images\\dashboard-inventory-img-scale.jpg")); // NOI18N
 
+        jMenuBar1.setBackground(new java.awt.Color(84, 119, 146));
+
+        jMenu1.setForeground(new java.awt.Color(255, 255, 255));
         jMenu1.setText("File");
 
+        ChangePassword.setBackground(new java.awt.Color(84, 119, 146));
+        ChangePassword.setForeground(new java.awt.Color(255, 255, 255));
         ChangePassword.setText("Ganti Password");
         ChangePassword.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -68,6 +91,8 @@ public class InventoryDashboardFrame extends javax.swing.JFrame {
         });
         jMenu1.add(ChangePassword);
 
+        Exit.setBackground(new java.awt.Color(84, 119, 146));
+        Exit.setForeground(new java.awt.Color(255, 255, 255));
         Exit.setText("Keluar");
         Exit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -78,8 +103,11 @@ public class InventoryDashboardFrame extends javax.swing.JFrame {
 
         jMenuBar1.add(jMenu1);
 
+        jMenu2.setForeground(new java.awt.Color(255, 255, 255));
         jMenu2.setText("Inventory");
 
+        DaftarStockBuku.setBackground(new java.awt.Color(84, 119, 146));
+        DaftarStockBuku.setForeground(new java.awt.Color(255, 255, 255));
         DaftarStockBuku.setText("Daftar Stock Buku");
         DaftarStockBuku.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -88,6 +116,8 @@ public class InventoryDashboardFrame extends javax.swing.JFrame {
         });
         jMenu2.add(DaftarStockBuku);
 
+        RackConfig.setBackground(new java.awt.Color(84, 119, 146));
+        RackConfig.setForeground(new java.awt.Color(255, 255, 255));
         RackConfig.setText("Pengaturan Rak");
         RackConfig.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -98,8 +128,11 @@ public class InventoryDashboardFrame extends javax.swing.JFrame {
 
         jMenuBar1.add(jMenu2);
 
+        jMenu3.setForeground(new java.awt.Color(255, 255, 255));
         jMenu3.setText("Purchase Order");
 
+        CreatePOMenu.setBackground(new java.awt.Color(84, 119, 146));
+        CreatePOMenu.setForeground(new java.awt.Color(255, 255, 255));
         CreatePOMenu.setText("Buat PO");
         CreatePOMenu.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -108,6 +141,8 @@ public class InventoryDashboardFrame extends javax.swing.JFrame {
         });
         jMenu3.add(CreatePOMenu);
 
+        CheckPOMenu.setBackground(new java.awt.Color(84, 119, 146));
+        CheckPOMenu.setForeground(new java.awt.Color(255, 255, 255));
         CheckPOMenu.setText("Daftar PO");
         CheckPOMenu.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -116,17 +151,18 @@ public class InventoryDashboardFrame extends javax.swing.JFrame {
         });
         jMenu3.add(CheckPOMenu);
 
+        jMenuItem1.setBackground(new java.awt.Color(84, 119, 146));
+        jMenuItem1.setForeground(new java.awt.Color(255, 255, 255));
+        jMenuItem1.setText("Terima PO");
+        jMenu3.add(jMenuItem1);
+
         jMenuBar1.add(jMenu3);
 
-        jMenu4.setText("Penerimaan");
-
-        jMenuItem8.setText("Daftar Penerimaan");
-        jMenu4.add(jMenuItem8);
-
-        jMenuBar1.add(jMenu4);
-
+        jMenu5.setForeground(new java.awt.Color(255, 255, 255));
         jMenu5.setText("Laporan");
 
+        jMenuItem9.setBackground(new java.awt.Color(84, 119, 146));
+        jMenuItem9.setForeground(new java.awt.Color(255, 255, 255));
         jMenuItem9.setText("Laporan Update Stock");
         jMenu5.add(jMenuItem9);
 
@@ -143,17 +179,18 @@ public class InventoryDashboardFrame extends javax.swing.JFrame {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jLabel1)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(0, 0, 0))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void DaftarStockBukuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DaftarStockBukuActionPerformed
-        StockBook stockBook = new StockBook();
-        stockBook.setFocusable(true);
+        StockBook stockBook = new StockBook(this);
         stockBook.setVisible(true);
+        stockBook.requestFocus();
+        this.setEnabled(false);
     }//GEN-LAST:event_DaftarStockBukuActionPerformed
 
     private void ExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ExitActionPerformed
@@ -161,6 +198,7 @@ public class InventoryDashboardFrame extends javax.swing.JFrame {
             this.setVisible(false);
             LoginFrame loginFrame = new LoginFrame();
             loginFrame.setVisible(true);
+            loginFrame.requestFocus();
         }
     }//GEN-LAST:event_ExitActionPerformed
 
@@ -170,54 +208,29 @@ public class InventoryDashboardFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_ChangePasswordActionPerformed
 
     private void RackConfigActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_RackConfigActionPerformed
-        RackConfig rakConfig = new RackConfig();
+        RackConfig rakConfig = new RackConfig(this);
         rakConfig.setVisible(true);
+        rakConfig.requestFocus();
+        this.setEnabled(false);
     }//GEN-LAST:event_RackConfigActionPerformed
 
     private void CreatePOMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CreatePOMenuActionPerformed
-        POManagement poManagement = new POManagement();
+        CreatePurchaseOrder poManagement = new CreatePurchaseOrder(this);
         poManagement.setVisible(true);
+        poManagement.requestFocus();
+        this.setEnabled(false);
     }//GEN-LAST:event_CreatePOMenuActionPerformed
 
     private void CheckPOMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CheckPOMenuActionPerformed
-        DaftarPO daftarPO = new DaftarPO();
+        DaftarPO daftarPO = new DaftarPO(this);
         daftarPO.setVisible(true);
+        daftarPO.requestFocus();
+        this.setEnabled(false);
     }//GEN-LAST:event_CheckPOMenuActionPerformed
 
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(InventoryDashboardFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(InventoryDashboardFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(InventoryDashboardFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(InventoryDashboardFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new InventoryDashboardFrame().setVisible(true);
-            }
-        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem ChangePassword;
@@ -230,10 +243,9 @@ public class InventoryDashboardFrame extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
-    private javax.swing.JMenu jMenu4;
     private javax.swing.JMenu jMenu5;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem8;
+    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem9;
     // End of variables declaration//GEN-END:variables
 }
