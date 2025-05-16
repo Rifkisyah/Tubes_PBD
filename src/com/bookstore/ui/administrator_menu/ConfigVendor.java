@@ -30,6 +30,7 @@ public class ConfigVendor extends javax.swing.JFrame {
     public ConfigVendor(SuperAdminDashboardFrame superAdminDashboardFrame) {
         this.superAdminDashboardFrame = superAdminDashboardFrame;
         
+        initComponents();
         this.setLocationRelativeTo(null);
         setTitle("Toko Buku - Maintenance Role Pegawai");
         
@@ -77,25 +78,27 @@ public class ConfigVendor extends javax.swing.JFrame {
     
     private void columnWrapping(){
         TableColumn column;
-        vendorTable.setAutoResizeMode(vendorTable.AUTO_RESIZE_OFF);
-        column = vendorTable.getColumnModel().getColumn(0);
+        dataVendorTable.setAutoResizeMode(dataVendorTable.AUTO_RESIZE_OFF);
+        column = dataVendorTable.getColumnModel().getColumn(0);
         column.setPreferredWidth(150);
-        column = vendorTable.getColumnModel().getColumn(1);
+        column = dataVendorTable.getColumnModel().getColumn(1);
         column.setPreferredWidth(250);
-        column = vendorTable.getColumnModel().getColumn(2);
+        column = dataVendorTable.getColumnModel().getColumn(2);
         column.setPreferredWidth(250);
-        column = vendorTable.getColumnModel().getColumn(2);
+        column = dataVendorTable.getColumnModel().getColumn(2);
         column.setPreferredWidth(250);
     }
 
     
-    public void setHeaderTable(){
+    private void setHeaderTable(){
         model = new DefaultTableModel();
+        dataVendorTable.setModel(model);
         model.addColumn("Id Vendor");
         model.addColumn("Nama Vendor");
         model.addColumn("Alamat Vendor");
         model.addColumn("Kontak vendor");
-        vendorTable.setModel(model);
+        
+
         columnWrapping();
         dataVendorToTabel();
     }
@@ -114,7 +117,7 @@ public class ConfigVendor extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         field_id_vendor = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
-        vendorTable = new javax.swing.JTable();
+        dataVendorTable = new javax.swing.JTable();
         addVendorButton = new javax.swing.JButton();
         exitButton = new javax.swing.JButton();
         deleteVendorButon = new javax.swing.JButton();
@@ -138,7 +141,7 @@ public class ConfigVendor extends javax.swing.JFrame {
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setText("ID Vendor");
 
-        vendorTable.setModel(new javax.swing.table.DefaultTableModel(
+        dataVendorTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -157,13 +160,13 @@ public class ConfigVendor extends javax.swing.JFrame {
                 return types [columnIndex];
             }
         });
-        vendorTable.setShowGrid(true);
-        vendorTable.addMouseListener(new java.awt.event.MouseAdapter() {
+        dataVendorTable.setShowGrid(true);
+        dataVendorTable.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                vendorTableMouseClicked(evt);
+                dataVendorTableMouseClicked(evt);
             }
         });
-        jScrollPane1.setViewportView(vendorTable);
+        jScrollPane1.setViewportView(dataVendorTable);
 
         addVendorButton.setBackground(new java.awt.Color(33, 52, 72));
         addVendorButton.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -265,9 +268,9 @@ public class ConfigVendor extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(field_kontak_vendor, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel5))
-                .addGap(40, 40, 40)
+                .addGap(33, 33, 33)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(37, 37, 37)
+                .addGap(44, 44, 44)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(exitButton)
                     .addComponent(addVendorButton)
@@ -291,10 +294,10 @@ public class ConfigVendor extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void vendorTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_vendorTableMouseClicked
-        field_id_vendor.setText(model.getValueAt(vendorTable.getSelectedRow(), 0) + "");
-        field_nama_vendor.setText(model.getValueAt(vendorTable.getSelectedRow(), 1) + "");
-    }//GEN-LAST:event_vendorTableMouseClicked
+    private void dataVendorTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_dataVendorTableMouseClicked
+        field_id_vendor.setText(model.getValueAt(dataVendorTable.getSelectedRow(), 0) + "");
+        field_nama_vendor.setText(model.getValueAt(dataVendorTable.getSelectedRow(), 1) + "");
+    }//GEN-LAST:event_dataVendorTableMouseClicked
 
     private void addVendorButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addVendorButtonActionPerformed
         String vendorId = field_id_vendor.getText().trim();
@@ -404,6 +407,7 @@ public class ConfigVendor extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addVendorButton;
+    private javax.swing.JTable dataVendorTable;
     private javax.swing.JButton deleteVendorButon;
     private javax.swing.JButton exitButton;
     private javax.swing.JTextField field_alamat_vendor;
@@ -417,6 +421,5 @@ public class ConfigVendor extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable vendorTable;
     // End of variables declaration//GEN-END:variables
 }

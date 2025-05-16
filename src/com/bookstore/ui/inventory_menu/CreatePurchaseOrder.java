@@ -247,15 +247,16 @@ public class CreatePurchaseOrder extends javax.swing.JFrame {
             EmployeeAccount employeeAccount = SessionAccount.getSessionAccount();
             String idPegawai = employeeAccount.getId();
 
-            String notaPO = generateNotaPO();
+            String idPO = generateNotaPO();
             LocalDate tanggalPO = LocalDate.now();
             LocalDate estimasiDatang = tanggalPO.plusDays(7); // edit
             BigDecimal totalBiaya = hargaSatuan.multiply(BigDecimal.valueOf(jumlahPO));
             String statusPO = "Diproses";
+            int jumlah_diterima = 0;
 
-            querySelector.insertPurchaseOrder(notaPO, idPegawai, idVendor, isbn, tanggalPO, estimasiDatang, jumlahPO, totalBiaya, statusPO);
+            querySelector.insertPurchaseOrder(idPO, idPegawai, idVendor, isbn, tanggalPO, estimasiDatang, jumlahPO, jumlah_diterima, totalBiaya, statusPO);
 
-            JOptionPane.showMessageDialog(this, "PO berhasil dibuat dengan Nota: " + notaPO, "Sukses", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "PO berhasil dibuat dengan Nota: " + idPO, "Sukses", JOptionPane.INFORMATION_MESSAGE);
 
         } catch (SQLException | ClassNotFoundException ex) {
             ex.printStackTrace();
@@ -351,6 +352,7 @@ public class CreatePurchaseOrder extends javax.swing.JFrame {
         jLabel7 = new javax.swing.JLabel();
         CancelPOButton = new javax.swing.JButton();
         total_book_field = new javax.swing.JTextField();
+        resetInputButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -361,7 +363,7 @@ public class CreatePurchaseOrder extends javax.swing.JFrame {
         jLabel4.setFont(new java.awt.Font("Ebrima", 1, 36)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(33, 52, 72));
         jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel4.setText("Purchase Order");
+        jLabel4.setText("Buat Purchase Order");
 
         jPanel2.setBackground(new java.awt.Color(84, 119, 146));
         jPanel2.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(33, 52, 72), 3, true));
@@ -463,7 +465,7 @@ public class CreatePurchaseOrder extends javax.swing.JFrame {
         jLabel3.setFont(new java.awt.Font("Ebrima", 1, 18)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(255, 255, 255));
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel3.setText("Buat Purchase Order");
+        jLabel3.setText("Formulir Pembuatan Purchase Order");
 
         CreateNewPOButton.setBackground(new java.awt.Color(0, 153, 0));
         CreateNewPOButton.setFont(new java.awt.Font("Ebrima", 1, 14)); // NOI18N
@@ -536,6 +538,16 @@ public class CreatePurchaseOrder extends javax.swing.JFrame {
 
         total_book_field.setFont(new java.awt.Font("Ebrima", 0, 14)); // NOI18N
 
+        resetInputButton.setBackground(new java.awt.Color(153, 0, 0));
+        resetInputButton.setFont(new java.awt.Font("Ebrima", 1, 14)); // NOI18N
+        resetInputButton.setForeground(new java.awt.Color(255, 255, 255));
+        resetInputButton.setText("Reset");
+        resetInputButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                resetInputButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -569,6 +581,8 @@ public class CreatePurchaseOrder extends javax.swing.JFrame {
                             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel3Layout.createSequentialGroup()
                                 .addGap(1, 1, 1)
                                 .addComponent(CloseButton, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(resetInputButton, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(CreateNewPOButton, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(18, 18, 18)
@@ -618,11 +632,12 @@ public class CreatePurchaseOrder extends javax.swing.JFrame {
                     .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(total_book_field, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(CheckAvailableButton))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 74, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(CreateNewPOButton)
                     .addComponent(CloseButton)
-                    .addComponent(CancelPOButton))
+                    .addComponent(CancelPOButton)
+                    .addComponent(resetInputButton))
                 .addGap(42, 42, 42))
         );
 
@@ -683,6 +698,7 @@ public class CreatePurchaseOrder extends javax.swing.JFrame {
         total_book_field.setText(model.getValueAt(VendorStockBookTable.getSelectedRow(), 7) + "");
         
         VendorStockBookTable.addMouseListener(new MouseAdapter() {
+            @Override
             public void mouseClicked(MouseEvent e) {
                 int selectedRow = VendorStockBookTable.getSelectedRow();
                 if (selectedRow >= 0) {
@@ -780,20 +796,14 @@ public class CreatePurchaseOrder extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Vendor Masih Kosong!", "Terjadi Masalah", JOptionPane.ERROR_MESSAGE);
             return;
         }
-
-        int totalPo;
+        
         try {
-            totalPo = Integer.parseInt(total_book_field.getText().trim());
+            int totalPo = Integer.parseInt(total_book_field.getText().trim());
             if (totalPo <= 0) {
                 JOptionPane.showMessageDialog(this, "Jumlah PO harus lebih dari 0!", "Terjadi Masalah", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Jumlah PO tidak valid!", "Terjadi Masalah", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
 
-        try {
             if(vendorName.equals("-- Vendor Belum Dipilih --")){
                 JOptionPane.showMessageDialog(this, "Vendor Belum Dipilih!", "info", JOptionPane.INFORMATION_MESSAGE);
                 return;
@@ -921,7 +931,7 @@ public class CreatePurchaseOrder extends javax.swing.JFrame {
                 // Update UI
                 poCondition("PoCreated");
 
-                JOptionPane.showMessageDialog(this, "Purchase Order berhasil dibuat!", "Sukses", JOptionPane.INFORMATION_MESSAGE);
+//                JOptionPane.showMessageDialog(this, "Purchase Order berhasil dibuat!", "Sukses", JOptionPane.INFORMATION_MESSAGE);
 
             } catch (SQLException | ClassNotFoundException ex) {
                 ex.printStackTrace();
@@ -929,6 +939,18 @@ public class CreatePurchaseOrder extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_CreateNewPOButtonActionPerformed
+
+    private void resetInputButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetInputButtonActionPerformed
+        isbn_field.setText("");
+        book_title_field.setText("");
+        vendor_combobox.setSelectedIndex(0);
+        price_field.setText("");
+        total_book_field.setText("");
+        
+        CreateNewPOButton.setEnabled(false);
+        CancelPOButton.setEnabled(false);
+        CheckAvailableButton.setEnabled(true);
+    }//GEN-LAST:event_resetInputButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -958,6 +980,7 @@ public class CreatePurchaseOrder extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextField price_field;
+    private javax.swing.JButton resetInputButton;
     private javax.swing.JTextField search_field;
     private javax.swing.JTextField total_book_field;
     private javax.swing.JComboBox<String> vendor_combobox;

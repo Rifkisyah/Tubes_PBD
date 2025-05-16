@@ -117,7 +117,6 @@ public class LoginFrame extends javax.swing.JFrame {
             }
         } else {
             JOptionPane.showMessageDialog(null, "Terdapat ID Atau Password Yang Salah!", "informasi", JOptionPane.ERROR_MESSAGE);
-
         }
     }
 

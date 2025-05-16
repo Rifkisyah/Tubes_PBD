@@ -4,6 +4,7 @@
  */
 package com.bookstore.ui;
 
+import com.bookstore.ui.administrator_menu.ConfigVendor;
 import com.bookstore.ui.inventory_menu.ChangePassword;
 import com.bookstore.ui.administrator_menu.MaintenancePegawai;
 import com.bookstore.ui.administrator_menu.MaintenanceRolePegawai;
@@ -65,7 +66,7 @@ public class SuperAdminDashboardFrame extends javax.swing.JFrame {
         jMenu3 = new javax.swing.JMenu();
         MaintenancePegawaiMenu = new javax.swing.JMenuItem();
         MaintenanceRolePegawaiMenu = new javax.swing.JMenuItem();
-        jMenuItem10 = new javax.swing.JMenuItem();
+        configVendorMenu = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -122,15 +123,15 @@ public class SuperAdminDashboardFrame extends javax.swing.JFrame {
         });
         jMenu3.add(MaintenanceRolePegawaiMenu);
 
-        jMenuItem10.setBackground(new java.awt.Color(84, 119, 146));
-        jMenuItem10.setForeground(new java.awt.Color(255, 255, 255));
-        jMenuItem10.setText("Konfigurasi Data Vendor");
-        jMenuItem10.addActionListener(new java.awt.event.ActionListener() {
+        configVendorMenu.setBackground(new java.awt.Color(84, 119, 146));
+        configVendorMenu.setForeground(new java.awt.Color(255, 255, 255));
+        configVendorMenu.setText("Konfigurasi Data Vendor");
+        configVendorMenu.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem10ActionPerformed(evt);
+                configVendorMenuActionPerformed(evt);
             }
         });
-        jMenu3.add(jMenuItem10);
+        jMenu3.add(configVendorMenu);
 
         jMenuBar1.add(jMenu3);
 
@@ -175,9 +176,12 @@ public class SuperAdminDashboardFrame extends javax.swing.JFrame {
         this.setEnabled(false);
     }//GEN-LAST:event_MaintenanceRolePegawaiMenuActionPerformed
 
-    private void jMenuItem10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem10ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jMenuItem10ActionPerformed
+    private void configVendorMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_configVendorMenuActionPerformed
+        ConfigVendor configVendor = new ConfigVendor(this);
+        configVendor.setVisible(true);
+        configVendor.requestFocus();
+        this.setEnabled(false);
+    }//GEN-LAST:event_configVendorMenuActionPerformed
 
     private void MaintenancePegawaiMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MaintenancePegawaiMenuActionPerformed
         MaintenancePegawai maintenancePegawai = new MaintenancePegawai(this);
@@ -195,10 +199,10 @@ public class SuperAdminDashboardFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem Exit;
     private javax.swing.JMenuItem MaintenancePegawaiMenu;
     private javax.swing.JMenuItem MaintenanceRolePegawaiMenu;
+    private javax.swing.JMenuItem configVendorMenu;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem10;
     // End of variables declaration//GEN-END:variables
 }

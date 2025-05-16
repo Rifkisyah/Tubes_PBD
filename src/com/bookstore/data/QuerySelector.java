@@ -26,23 +26,24 @@ public class QuerySelector {
     public void selectAllPurchaseOrder() throws ClassNotFoundException, SQLException {
         String query =
             "SELECT " +
-            "po.nota_PO, " +
+            "po.id_PO, " +
             "po.id_pegawai, " +
             "ap.nama AS nama_pegawai, " +
             "po.id_vendor, " +
-            "v.Nama_Vendor, " +
+            "v.nama_vendor, " +
             "po.isbn, " +
             "mb.judul_buku, " +
             "po.tanggal_PO, " +
             "po.estimasi_tanggal_datang, " +
             "po.jumlah_PO, " +
+            "po.jumlah_diterima, " +
             "po.total_biaya, " +
             "po.status_PO " +
             "FROM T_PurchaseOrder po " +
             "JOIN T_AkunPegawai ap ON po.id_pegawai = ap.id_pegawai " +
             "JOIN T_MasterBuku mb ON po.isbn = mb.isbn " +
             "JOIN T_Vendor v ON po.id_vendor = v.id_vendor " +
-            "ORDER BY po.nota_PO ASC";
+            "ORDER BY po.id_PO ASC";
         
         preparedStatement = mysqlConnection.getConnection().prepareStatement(query);
         resultSet = preparedStatement.executeQuery();
@@ -144,6 +145,64 @@ public class QuerySelector {
         resultSet = preparedStatement.executeQuery();
     }
     
+    public void selectPurchaseOrderByStatus(String status) throws ClassNotFoundException, SQLException {
+        String query =
+            "SELECT " +
+            "po.Id_PO, " +
+            "po.id_pegawai, " +
+            "p.nama, " +
+            "po.id_vendor, " +
+            "v.nama_vendor, " +
+            "po.isbn, " +
+            "mb.judul_buku, " +
+            "po.tanggal_po, " +
+            "po.estimasi_tanggal_datang, " +
+            "po.jumlah_po, " +
+            "po.jumlah_diterima, " +
+            "po.total_biaya, " +
+            "po.status_po " +
+            "FROM t_purchaseorder po " +
+            "LEFT JOIN t_vendor v ON po.id_vendor = v.id_vendor " +
+            "JOIN t_akunpegawai p ON po.id_pegawai = p.id_pegawai " +
+            "JOIN t_masterbuku mb ON po.isbn = mb.isbn " +
+            "WHERE po.status_po = ? " +
+            "ORDER BY po.Id_PO ASC";
+
+        preparedStatement = mysqlConnection.getConnection().prepareStatement(query);
+        preparedStatement.setString(1, status);
+        resultSet = preparedStatement.executeQuery();
+    }
+
+    public void selectPurchaseOrderByTwoStatus(String status1, String status2) throws ClassNotFoundException, SQLException {
+        String query =
+            "SELECT " +
+            "po.Id_PO, " +
+            "po.id_pegawai, " +
+            "p.nama, " +
+            "po.id_vendor, " +
+            "v.nama_vendor, " +
+            "po.isbn, " +
+            "mb.judul_buku, " +
+            "po.tanggal_po, " +
+            "po.estimasi_tanggal_datang, " +
+            "po.jumlah_po, " +
+            "po.jumlah_diterima, " +
+            "po.total_biaya, " +
+            "po.status_po " +
+            "FROM t_purchaseorder po " +
+            "LEFT JOIN t_vendor v ON po.id_vendor = v.id_vendor " +
+            "JOIN t_akunpegawai p ON po.id_pegawai = p.id_pegawai " +
+            "JOIN t_masterbuku mb ON po.isbn = mb.isbn " +
+            "WHERE po.status_po IN (?, ?) " +
+            "ORDER BY po.Id_PO ASC";
+
+        preparedStatement = mysqlConnection.getConnection().prepareStatement(query);
+        preparedStatement.setString(1, status1);
+        preparedStatement.setString(2, status2);
+        resultSet = preparedStatement.executeQuery();
+    }
+
+    
     /**
      * Ambil semua data dari sebuah tabel.
      */
@@ -197,13 +256,6 @@ public class QuerySelector {
         preparedStatement.setString(2, value2);
         preparedStatement.setString(3, value3);
         resultSet = preparedStatement.executeQuery();
-        
-        System.out.println("DEBUG SQL: SELECT " + selectedColumn1 + ", " + selectedColumn2 +
-                   " FROM " + tableName +
-                   " WHERE " + column1 + " = '" + value1 +
-                   "' AND " + column2 + " = '" + value2 +
-                   "' AND " + column3 + " = '" + value3 + "'");
-
     }
 
     // =========================== COUNT ===============================
@@ -340,16 +392,53 @@ public class QuerySelector {
 
         resultSet = preparedStatement.executeQuery();
     }
+    
+    public void selectLikeWithJoinPurchaseOrder(String col1, String col2, String val) throws SQLException, ClassNotFoundException {
+        String query =
+            "SELECT " +
+            "po.Id_PO, po.id_pegawai, po.id_vendor, v.nama_vendor, po.isbn, " +
+            "po.tanggal_po, po.estimasi_tanggal_datang, po.jumlah_po, po.total_biaya, po.status_po " +
+            "FROM t_purchaseorder po " +
+            "JOIN t_vendor v ON po.id_vendor = v.id_vendor " +
+            "WHERE po." + col1 + " LIKE ? OR po." + col2 + " LIKE ? " +
+            "ORDER BY po.Id_PO ASC";
+
+        preparedStatement = mysqlConnection.getConnection().prepareStatement(query);
+        preparedStatement.setString(1, "%" + val + "%");
+        preparedStatement.setString(2, "%" + val + "%");
+
+        resultSet = preparedStatement.executeQuery();
+    }
+
+    public void selectLikeWithJoinAndFilterPurchaseOrder(String col1, String col2, String val, String col3, String val3) throws SQLException, ClassNotFoundException {
+        String query =
+            "SELECT " +
+            "po.Id_PO, po.id_pegawai, po.id_vendor, v.nama_vendor, po.isbn, " +
+            "po.tanggal_po, po.estimasi_tanggal_datang, po.jumlah_po, po.total_biaya, po.status_po " +
+            "FROM t_purchaseorder po " +
+            "JOIN t_vendor v ON po.id_vendor = v.id_vendor " +
+            "WHERE (po." + col1 + " LIKE ? OR po." + col2 + " LIKE ?) " +
+            "AND po." + col3 + " = ? " +
+            "ORDER BY po.Id_PO ASC";
+
+        preparedStatement = mysqlConnection.getConnection().prepareStatement(query);
+        preparedStatement.setString(1, "%" + val + "%");
+        preparedStatement.setString(2, "%" + val + "%");
+        preparedStatement.setString(3, val3);
+
+        resultSet = preparedStatement.executeQuery();
+    }
+
 
     // ==================== INSERT ====================
 
     // menambahkan PO setelah check ketersediaan PO
-    public void insertPurchaseOrder(String purchaseOrderNumber, String employeeId, String vendorId, String isbn, LocalDate purchaseDate, LocalDate estimatedArrivalDate, int orderQuantity, BigDecimal totalCost, String orderStatus) throws SQLException, ClassNotFoundException {
+    public void insertPurchaseOrder(String purchaseOrderNumber, String employeeId, String vendorId, String isbn, LocalDate purchaseDate, LocalDate estimatedArrivalDate, int orderQuantity, int recievedQuantity, BigDecimal totalCost, String orderStatus) throws SQLException, ClassNotFoundException {
         this.mysqlConnection = new MysqlConnection();
 
         String query  = "INSERT INTO t_purchaseorder " +
-                           "(nota_PO, id_pegawai, id_vendor, isbn, tanggal_po, estimasi_tanggal_datang, jumlah_po, total_biaya, status_po) " +
-                           "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                           "(id_PO, id_pegawai, id_vendor, isbn, tanggal_po, estimasi_tanggal_datang, jumlah_po, jumlah_diterima, total_biaya, status_po) " +
+                           "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         this.preparedStatement = mysqlConnection.getConnection().prepareStatement(query);
         preparedStatement.setString(1, purchaseOrderNumber);
@@ -359,8 +448,9 @@ public class QuerySelector {
         preparedStatement.setDate(5, java.sql.Date.valueOf(purchaseDate));
         preparedStatement.setDate(6, java.sql.Date.valueOf(estimatedArrivalDate));
         preparedStatement.setInt(7, orderQuantity);
-        preparedStatement.setBigDecimal(8, totalCost);
-        preparedStatement.setString(9, orderStatus);
+        preparedStatement.setInt(8, recievedQuantity);
+        preparedStatement.setBigDecimal(9, totalCost);
+        preparedStatement.setString(10, orderStatus);
 
         this.affectedRows = preparedStatement.executeUpdate(); // untuk menyimpan status eksekusi (jumlah baris terpengaruh)
     }
@@ -411,6 +501,25 @@ public class QuerySelector {
         preparedStatement.setString(5, val5);
         affectedRows = preparedStatement.executeUpdate();
     }
+    
+    public void insertReceivedPO(String idPenerimaanPO, String idPO, String isbn, LocalDate tanggalTerima, int jumlahDatang, BigDecimal totalHarga, String keteranganPenerimaan, String status) throws SQLException, ClassNotFoundException {
+
+        String query = "INSERT INTO t_penerimaanpurchaseorder " +
+                       "(Id_penerimaan_PO, id_po, isbn, tanggal_terima, jumlah_datang, total_harga, keterangan_penerimaan, status_penerimaan) " +
+                       "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
+        preparedStatement = mysqlConnection.getConnection().prepareStatement(query);
+        preparedStatement.setString(1, idPenerimaanPO);
+        preparedStatement.setString(2, idPO);
+        preparedStatement.setString(3, isbn);
+        preparedStatement.setDate(4, java.sql.Date.valueOf(tanggalTerima)); // Jika ingin pakai java.sql.Date, gunakan setDate()
+        preparedStatement.setInt(5, jumlahDatang);
+        preparedStatement.setBigDecimal(6, totalHarga);
+        preparedStatement.setString(7, keteranganPenerimaan);
+        preparedStatement.setString(8, status);
+
+        affectedRows = preparedStatement.executeUpdate();
+    }
 
 
     // ==================== UPDATE ====================
@@ -423,6 +532,14 @@ public class QuerySelector {
         preparedStatement = mysqlConnection.getConnection().prepareStatement(query);
         preparedStatement.setString(1, value1);
         preparedStatement.setString(2, value2);
+        affectedRows = preparedStatement.executeUpdate();
+    }
+    
+    public void updateReceviedQty(int qty, String idPo) throws SQLException, ClassNotFoundException {
+        String query = "UPDATE T_PurchaseOrder SET jumlah_diterima = ? WHERE id_po = ?";
+        preparedStatement = mysqlConnection.getConnection().prepareStatement(query);
+        preparedStatement.setInt(1, qty);
+        preparedStatement.setString(2, idPo);
         affectedRows = preparedStatement.executeUpdate();
     }
 
@@ -470,6 +587,20 @@ public class QuerySelector {
         affectedRows = preparedStatement.executeUpdate();
     }
 
+    public void updateTwoColumns(String table, String[] columns, Object[] values, String keyColumn, String keyValue) throws SQLException, ClassNotFoundException {
+        if (columns.length != 2 || values.length != 2) {
+            throw new IllegalArgumentException("Harus tepat 2 kolom dan 2 nilai.");
+        }
+
+        String query = "UPDATE " + table + " SET " + columns[0] + " = ?, " + columns[1] + " = ? WHERE " + keyColumn + " = ?";
+        preparedStatement = mysqlConnection.getConnection().prepareStatement(query);
+        preparedStatement.setObject(1, values[0]);
+        preparedStatement.setObject(2, values[1]);
+        preparedStatement.setString(3, keyValue);
+        preparedStatement.executeUpdate();
+    }
+
+    
     // ==================== DELETE ====================
 
     /**

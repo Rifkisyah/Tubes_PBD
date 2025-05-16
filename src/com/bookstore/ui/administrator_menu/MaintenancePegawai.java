@@ -587,6 +587,7 @@ public class MaintenancePegawai extends javax.swing.JFrame {
         SavePegawaiButton.setText("Update");
 
         employeeTable.addMouseListener(new MouseAdapter() {
+            @Override
             public void mouseClicked(MouseEvent e) {
                 int selectedRow = employeeTable.getSelectedRow();
                 if (selectedRow >= 0) {

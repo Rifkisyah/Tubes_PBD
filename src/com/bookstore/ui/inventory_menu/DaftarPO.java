@@ -9,8 +9,11 @@ import com.bookstore.ui.InventoryDashboardFrame;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.sql.SQLException;
+import java.util.HashMap;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
@@ -20,8 +23,10 @@ import javax.swing.table.TableColumn;
  */
 public class DaftarPO extends javax.swing.JFrame {
     InventoryDashboardFrame inventoryDashboardFrame;
-    private DefaultTableModel tableModel;
+    private DefaultTableModel model;
     QuerySelector querySelector;
+    private boolean filterComboBoxIntialize = false;
+    private HashMap<String, String> vendorNameToIdMap = new HashMap<>();
     /**
      * Creates new form NewJFrame
      */
@@ -50,6 +55,25 @@ public class DaftarPO extends javax.swing.JFrame {
         });
         
         setHeaderTable();
+        dataToComboBox();
+        
+        search_field.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                performSearch(search_field.getText().trim());
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                performSearch(search_field.getText().trim());
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                performSearch(search_field.getText().trim());
+            }
+            
+        });
     }
     
         private void columnSizing(){
@@ -74,34 +98,37 @@ public class DaftarPO extends javax.swing.JFrame {
         column.setPreferredWidth(200);
         column = POTabel.getColumnModel().getColumn(8); // Estimasi Tiba
         column.setPreferredWidth(100);
-        column = POTabel.getColumnModel().getColumn(9); // Jumlah PO
+        column = POTabel.getColumnModel().getColumn(9); // Estimasi Tiba
+        column.setPreferredWidth(100);
+        column = POTabel.getColumnModel().getColumn(10); // Jumlah PO
         column.setPreferredWidth(200);
-        column = POTabel.getColumnModel().getColumn(10); // Total Biaya
+        column = POTabel.getColumnModel().getColumn(11); // Total Biaya
         column.setPreferredWidth(120);
     }
     
-    private void getDataTable(){
+    private void dataToTable(){
         this.querySelector = new QuerySelector();
 
         try{
             querySelector.selectAllPurchaseOrder();            
             
             while(querySelector.getResultSet().next()){
-                Object[] fieldx = new Object[12];
-                fieldx[0] = querySelector.getResultSet().getString("nota_PO");
+                Object[] fieldx = new Object[13];
+                fieldx[0] = querySelector.getResultSet().getString("id_PO");
                 fieldx[1] = querySelector.getResultSet().getString("id_pegawai");
                 fieldx[2] = querySelector.getResultSet().getString("nama_pegawai");
                 fieldx[3] = querySelector.getResultSet().getString("id_vendor");
-                fieldx[4] = querySelector.getResultSet().getString("Nama_Vendor");
+                fieldx[4] = querySelector.getResultSet().getString("nama_vendor");
                 fieldx[5] = querySelector.getResultSet().getString("isbn");
                 fieldx[6] = querySelector.getResultSet().getString("judul_buku");
                 fieldx[7] = querySelector.getResultSet().getString("tanggal_PO");
                 fieldx[8] = querySelector.getResultSet().getString("estimasi_tanggal_datang");
                 fieldx[9] = querySelector.getResultSet().getInt("jumlah_PO");
-                fieldx[10] = querySelector.getResultSet().getDouble("total_biaya");
-                fieldx[11] = querySelector.getResultSet().getString("status_PO");
+                fieldx[10] = querySelector.getResultSet().getInt("jumlah_diterima");
+                fieldx[11] = querySelector.getResultSet().getDouble("total_biaya");
+                fieldx[12] = querySelector.getResultSet().getString("status_PO");
 
-                this.tableModel.addRow(fieldx);
+                this.model.addRow(fieldx);
             }
 
         } catch (SQLException | ClassNotFoundException ex){
@@ -109,28 +136,100 @@ public class DaftarPO extends javax.swing.JFrame {
         }
     }
 
+    private void dataToComboBox() {
+        try {
+            querySelector.selectAllFromTable("t_purchaseorder");
+
+            // Simpan item index ke-0
+            Object firstItem = null;
+            if (filterSearch.getItemCount() > 0) {
+                firstItem = filterSearch.getItemAt(0);
+            }
+
+            // Hapus semua item, lalu tambahkan kembali item index 0
+            filterSearch.removeAllItems();
+            if (firstItem != null) {
+                filterSearch.addItem(firstItem.toString()); // tambah kembali item 0
+            }
+
+            // Tambahkan data dari database
+            while (querySelector.getResultSet().next()) {
+                String status = querySelector.getResultSet().getString("status_po");
+
+                // Hindari duplikat dengan index 0 (opsional)
+                if (firstItem == null || !firstItem.toString().equals(status)) {
+                    filterSearch.addItem(status);
+                }
+            }
+
+        } catch (SQLException | ClassNotFoundException ex) {
+            ex.printStackTrace();
+        }
+    }
     
     private void setHeaderTable(){
-        this.tableModel = new DefaultTableModel();
-        POTabel.setModel(tableModel);
+        this.model = new DefaultTableModel();
+        POTabel.setModel(model);
 
-        tableModel.addColumn("No. PO");
-        tableModel.addColumn("ID Pegawai");
-        tableModel.addColumn("Nama Pegawai");
-        tableModel.addColumn("ID Vendor");
-        tableModel.addColumn("Nama Vendor");
-        tableModel.addColumn("ISBN");
-        tableModel.addColumn("Judul Buku");
-        tableModel.addColumn("Tanggal PO");
-        tableModel.addColumn("Estimasi Tiba");
-        tableModel.addColumn("Jumlah PO");
-        tableModel.addColumn("Total Biaya");
-        tableModel.addColumn("Status PO");
+        model.addColumn("No. PO");
+        model.addColumn("ID Pegawai");
+        model.addColumn("Nama Pegawai");
+        model.addColumn("ID Vendor");
+        model.addColumn("Nama Vendor");
+        model.addColumn("ISBN");
+        model.addColumn("Judul Buku");
+        model.addColumn("Tanggal PO");
+        model.addColumn("Estimasi Tiba");
+        model.addColumn("Jumlah PO");
+        model.addColumn("Jumlah Diterima");
+        model.addColumn("Total Biaya");
+        model.addColumn("Status PO");
 
         columnSizing();
-        getDataTable();
+        dataToTable();
     }
 
+    private void performSearch(String search_value) {
+        model.getDataVector().removeAllElements();
+        model.fireTableDataChanged();
+
+        try {
+            if (search_value == null || search_value.trim().isEmpty()) {
+                dataToTable();
+            } else {
+                String statusName = (String) filterSearch.getSelectedItem();
+                
+                if(statusName.equals("-- Pilih Filter Status PO --")){
+                    querySelector.selectLikeWithJoinPurchaseOrder("id_po", "judul_buku", search_value);
+                } else {
+                    querySelector.selectAllByColumnsLike("T_Purchaseorder", "status_po", statusName);
+                }
+
+                if (querySelector.getResultSet().isBeforeFirst()) {
+                    while (querySelector.getResultSet().next()) {
+                        Object[] fieldx = new Object[12];
+                        fieldx[0] = querySelector.getResultSet().getString("id_PO");
+                        fieldx[1] = querySelector.getResultSet().getString("id_pegawai");
+                        fieldx[2] = querySelector.getResultSet().getString("nama_pegawai");
+                        fieldx[3] = querySelector.getResultSet().getString("id_vendor");
+                        fieldx[4] = querySelector.getResultSet().getString("nama_vendor");
+                        fieldx[5] = querySelector.getResultSet().getString("isbn");
+                        fieldx[6] = querySelector.getResultSet().getString("judul_buku");
+                        fieldx[7] = querySelector.getResultSet().getString("tanggal_PO");
+                        fieldx[8] = querySelector.getResultSet().getString("estimasi_tanggal_datang");
+                        fieldx[9] = querySelector.getResultSet().getInt("jumlah_PO");
+                        fieldx[10] = querySelector.getResultSet().getDouble("total_biaya");
+                        fieldx[11] = querySelector.getResultSet().getString("status_PO");
+                        this.model.addRow(fieldx);
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(this, "Pegawai Tidak Ditemukan!", "Gagal Mencari Rak", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        } catch (SQLException | ClassNotFoundException ex) {
+            ex.printStackTrace();
+        }
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -141,11 +240,22 @@ public class DaftarPO extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        search_field = new javax.swing.JTextField();
         jPanel1 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         POTabel = new javax.swing.JTable();
         CloseButton = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
+        search_field1 = new javax.swing.JTextField();
+        filterSearch = new javax.swing.JComboBox<>();
+
+        search_field.setFont(new java.awt.Font("Ebrima", 0, 14)); // NOI18N
+        search_field.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                search_fieldActionPerformed(evt);
+            }
+        });
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -161,13 +271,13 @@ public class DaftarPO extends javax.swing.JFrame {
         POTabel.setFont(new java.awt.Font("Ebrima", 1, 14)); // NOI18N
         POTabel.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null, null}
+                {null, null, null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "No PO", "ID Pegawai", "Nama Pegawai", "ISBN", "Judul Buku", "ID Vendor", "Nama Vendor", "Tanggal PO", "Estimasi Tiba", "Jumlah PO", "Total Biaya", "Status PO"
+                "ID PO", "ID Pegawai", "Nama Pegawai", "ISBN", "Judul Buku", "ID Vendor", "Nama Vendor", "Tanggal PO", "Estimasi Tiba", "Jumlah PO", "Jumlah Diterima", "Total Biaya", "Status PO"
             }
         ));
         POTabel.setAlignmentY(1.0F);
@@ -183,6 +293,25 @@ public class DaftarPO extends javax.swing.JFrame {
             }
         });
 
+        jLabel3.setFont(new java.awt.Font("Ebrima", 1, 18)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        jLabel3.setText("Cari PO :");
+
+        search_field1.setFont(new java.awt.Font("Ebrima", 0, 14)); // NOI18N
+        search_field1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                search_field1ActionPerformed(evt);
+            }
+        });
+
+        filterSearch.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "-- Pilih Filter Status PO --" }));
+        filterSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                filterSearchActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -191,10 +320,21 @@ public class DaftarPO extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 702, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(CloseButton, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
+                                .addGap(16, 16, 16)
+                                .addComponent(jLabel3)
+                                .addGap(18, 18, 18)
+                                .addComponent(search_field1, javax.swing.GroupLayout.PREFERRED_SIZE, 392, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 21, Short.MAX_VALUE)
+                                .addComponent(filterSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(CloseButton, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 668, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGap(17, 17, 17)))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -202,11 +342,17 @@ public class DaftarPO extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(31, 31, 31)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(search_field1, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(filterSearch))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(CloseButton)
-                .addGap(131, 131, 131))
+                .addGap(58, 58, 58))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -218,7 +364,7 @@ public class DaftarPO extends javax.swing.JFrame {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 417, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))
         );
 
@@ -233,6 +379,62 @@ public class DaftarPO extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_CloseButtonActionPerformed
 
+    private void search_fieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_search_fieldActionPerformed
+        String search_value = search_field.getText().trim();
+        performSearch(search_value);
+    }//GEN-LAST:event_search_fieldActionPerformed
+
+    private void search_field1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_search_field1ActionPerformed
+        String search_value = search_field.getText().trim();
+        performSearch(search_value);
+    }//GEN-LAST:event_search_field1ActionPerformed
+
+    private void filterSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filterSearchActionPerformed
+        if(this.filterComboBoxIntialize){
+            String filterVendorName = (String) filterSearch.getSelectedItem();
+            search_field.setText("");
+
+            if (filterVendorName == null || filterVendorName.equals("-- Pilih Filter Vendor --")) {
+                dataToTable();
+                return;
+            } else {
+                model.getDataVector().removeAllElements();
+                model.fireTableDataChanged();
+
+                try {
+                    if (filterVendorName.trim().isEmpty()) {
+                        performSearch(filterVendorName);
+                    } else {
+                        querySelector.selectDetailMasterBukuByVendorFilter(filterVendorName, "vendor");
+
+                        if (querySelector.getResultSet().isBeforeFirst()) {
+                            while (querySelector.getResultSet().next()) {
+                                Object[] fieldx = new Object[12];
+                                fieldx[0] = querySelector.getResultSet().getString("id_PO");
+                                fieldx[1] = querySelector.getResultSet().getString("id_pegawai");
+                                fieldx[2] = querySelector.getResultSet().getString("nama_pegawai");
+                                fieldx[3] = querySelector.getResultSet().getString("id_vendor");
+                                fieldx[4] = querySelector.getResultSet().getString("nama_vendor");
+                                fieldx[5] = querySelector.getResultSet().getString("isbn");
+                                fieldx[6] = querySelector.getResultSet().getString("judul_buku");
+                                fieldx[7] = querySelector.getResultSet().getString("tanggal_PO");
+                                fieldx[8] = querySelector.getResultSet().getString("estimasi_tanggal_datang");
+                                fieldx[9] = querySelector.getResultSet().getInt("jumlah_PO");
+                                fieldx[10] = querySelector.getResultSet().getDouble("total_biaya");
+                                fieldx[11] = querySelector.getResultSet().getString("status_PO");
+                                this.model.addRow(fieldx);
+                            }
+                        } else {
+                            JOptionPane.showMessageDialog(this, "Buku Tidak Ditemukan!", "Gagal Mencari Rak", JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+                } catch (SQLException | ClassNotFoundException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }
+    }//GEN-LAST:event_filterSearchActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -240,8 +442,12 @@ public class DaftarPO extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton CloseButton;
     private javax.swing.JTable POTabel;
+    private javax.swing.JComboBox<String> filterSearch;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextField search_field;
+    private javax.swing.JTextField search_field1;
     // End of variables declaration//GEN-END:variables
 }
