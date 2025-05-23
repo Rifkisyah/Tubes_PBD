@@ -248,6 +248,15 @@ public class QuerySelector {
         resultSet = preparedStatement.executeQuery();
     }
     
+    public void selectOneColumnByThreeKeys(String selectedColumn, String tableName, String column1, String value1, String column2, String value2, String column3, String value3) throws ClassNotFoundException, SQLException{
+        String query = "SELECT " + selectedColumn + " FROM " + tableName + " WHERE " + column1 + " = ? AND " + column2 + " = ? AND " + column3 + " = ?";
+        preparedStatement = mysqlConnection.getConnection().prepareStatement(query);
+        preparedStatement.setString(1, value1);
+        preparedStatement.setString(2, value2); 
+        preparedStatement.setString(3, value3);
+        resultSet = preparedStatement.executeQuery();
+    }
+    
     // untuk menampilkan 2 kolom berdasarkan 3 nilai kolom tertentu di tabel
     public void selectTwoColumnsByThreeKeys(String selectedColumn1, String selectedColumn2, String tableName, String column1, String value1, String column2, String value2, String column3, String value3) throws SQLException, ClassNotFoundException {
         String query = "SELECT " + selectedColumn1 + ", " + selectedColumn2 + " FROM " + tableName + " WHERE " + column1 + " = ? AND " + column2 + " = ? AND " + column3 + " = ? ORDER BY 1 ASC";
@@ -257,6 +266,7 @@ public class QuerySelector {
         preparedStatement.setString(3, value3);
         resultSet = preparedStatement.executeQuery();
     }
+    
 
     // =========================== COUNT ===============================
     

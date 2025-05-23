@@ -900,7 +900,7 @@ public class CreatePurchaseOrder extends javax.swing.JFrame {
                 }
 
                 // Ambil stok buku berdasarkan ISBN dan ID Vendor
-                querySelector.selectOneColumnByTwoKeys("stock_buku", "T_DetailMasterbuku", "isbn", isbn, "id_vendor", idVendor);
+                querySelector.selectOneColumnByThreeKeys("stock_buku", "T_DetailMasterbuku", "isbn", isbn, "id_vendor", idVendor, "jenis_inventaris", "vendor");
 
                 ResultSet stockResult = querySelector.getResultSet();
                 if (!stockResult.next()) {
