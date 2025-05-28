@@ -5,28 +5,12 @@
             <url>src/com/bookstore/ui/inventory_menu/ChangePassword.java</url>
             <bookmark id="22">
                 <name/>
-                <line>196</line>
+                <line>212</line>
                 <key/>
             </bookmark>
             <bookmark id="23">
                 <name/>
-                <line>217</line>
-                <key/>
-            </bookmark>
-        </file>
-        <file>
-            <url>src/com/bookstore/ui/inventory_menu/StockBook.java</url>
-            <bookmark id="21">
-                <name/>
-                <line>82</line>
-                <key/>
-            </bookmark>
-        </file>
-        <file>
-            <url>src/com/bookstore/ui/inventory_menu/DaftarPO.java</url>
-            <bookmark id="20">
-                <name/>
-                <line>112</line>
+                <line>212</line>
                 <key/>
             </bookmark>
         </file>
@@ -133,48 +117,63 @@
             <url>src/com/bookstore/ui/inventory_menu/RackConfig.java</url>
             <bookmark id="13">
                 <name/>
-                <line>68</line>
+                <line>67</line>
                 <key/>
             </bookmark>
             <bookmark id="14">
                 <name/>
-                <line>320</line>
+                <line>338</line>
                 <key/>
             </bookmark>
             <bookmark id="16">
                 <name/>
-                <line>326</line>
+                <line>344</line>
                 <key/>
             </bookmark>
             <bookmark id="15">
                 <name/>
-                <line>329</line>
+                <line>347</line>
                 <key/>
             </bookmark>
             <bookmark id="17">
                 <name/>
-                <line>368</line>
+                <line>383</line>
                 <key/>
             </bookmark>
             <bookmark id="18">
                 <name/>
-                <line>372</line>
+                <line>387</line>
                 <key/>
             </bookmark>
             <bookmark id="19">
                 <name/>
-                <line>376</line>
+                <line>391</line>
+                <key/>
+            </bookmark>
+        </file>
+        <file>
+            <url>src/com/bookstore/ui/inventory_menu/StockBook.java</url>
+            <bookmark id="21">
+                <name/>
+                <line>84</line>
+                <key/>
+            </bookmark>
+        </file>
+        <file>
+            <url>src/com/bookstore/ui/inventory_menu/DaftarPO.java</url>
+            <bookmark id="20">
+                <name/>
+                <line>111</line>
                 <key/>
             </bookmark>
         </file>
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/User/Documents/kuliah/semester4/pemrograman_desktop/project/toko_buku/Fix_Tubes/src/com/bookstore/ui/inventory_menu/CreatePurchaseOrder.java</file>
             <file>file:/D:/User/Documents/kuliah/semester4/pemrograman_desktop/project/toko_buku/Fix_Tubes/src/com/bookstore/data/QuerySelector.java</file>
-            <file>file:/D:/User/Documents/kuliah/semester4/pemrograman_desktop/project/toko_buku/Fix_Tubes/src/com/bookstore/ui/InventoryDashboardFrame.java</file>
-            <file>file:/D:/User/Documents/kuliah/semester4/pemrograman_desktop/project/toko_buku/Fix_Tubes/src/com/bookstore/data/MysqlConnection.java</file>
-            <file>file:/D:/User/Documents/kuliah/semester4/pemrograman_desktop/project/toko_buku/Fix_Tubes/src/com/bookstore/ui/LoginFrame.java</file>
+            <file>file:/D:/User/Documents/kuliah/semester4/pemrograman_desktop/project/toko_buku/Fix_Tubes/src/com/bookstore/ui/inventory_menu/JFrameBuatPurchaseOrder.java</file>
+            <file>file:/D:/User/Documents/kuliah/semester4/pemrograman_desktop/project/toko_buku/Fix_Tubes/src/com/bookstore/ui/inventory_menu/JFrameKonfigurasiRak.java</file>
+            <file>file:/D:/User/Documents/kuliah/semester4/pemrograman_desktop/project/toko_buku/Fix_Tubes/src/com/bookstore/model/PurchaseOrder.java</file>
         </group>
     </open-files>
 </project-private>

@@ -1,6 +1,6 @@
 package com.bookstore.main;
 
-import com.bookstore.ui.LoginFrame;
+import com.bookstore.ui.JFrameLogin;
 
 /**
  *
@@ -8,7 +8,7 @@ import com.bookstore.ui.LoginFrame;
  */
 public class Main {
     public static void main(String[] args) {
-        LoginFrame mainFrame = new LoginFrame();
+        JFrameLogin mainFrame = new JFrameLogin();
         mainFrame.setVisible(true);
     }
 }

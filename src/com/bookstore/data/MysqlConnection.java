@@ -16,7 +16,6 @@ public class MysqlConnection {
         this.username = "root";
         this.password = "root";
         Class.forName("com.mysql.cj.jdbc.Driver");
-        System.out.println("koneksi berhasil!");
         return DriverManager.getConnection(url, username, password);
     }
 }
