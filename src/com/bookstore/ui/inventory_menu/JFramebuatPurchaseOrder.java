@@ -8,6 +8,7 @@ import com.bookstore.model.Vendor;
 import com.bookstore.ui.JFrameGudang;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -33,29 +34,47 @@ public class JFrameBuatPurchaseOrder extends javax.swing.JFrame {
     /**
      * Creates new form POManagement
      */
+    
+    private final WindowListener defaultWindowListener = new WindowAdapter() {
+        @Override
+        public void windowClosing(WindowEvent e) {
+            int option = JOptionPane.showConfirmDialog(JFrameBuatPurchaseOrder.this,
+                    "Apakah Kamu Yakin Ingin Keluar?",
+                    "Konfirmasi Keluar", JOptionPane.YES_NO_OPTION);
+
+            if (option == JOptionPane.YES_OPTION) {
+                // Aksi keluar jika user setuju
+                JFrameBuatPurchaseOrder.this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                JFrameBuatPurchaseOrder.this.dispose();
+                inventoryDashboardFrame.setEnabled(true);
+                inventoryDashboardFrame.requestFocus();
+            } else {
+                // Jangan lakukan apapun (biarkan frame tetap terbuka)
+                JFrameBuatPurchaseOrder.this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+            }
+        }
+    };
+
+
+    private final WindowListener poCheckedWindowListener = new WindowAdapter() {
+        @Override
+        public void windowClosing(WindowEvent e) {
+            JOptionPane.showMessageDialog(JFrameBuatPurchaseOrder.this,
+                    "Tidak Bisa Keluar, Sedang Proses PO",
+                    "Peringatan", JOptionPane.WARNING_MESSAGE);
+            // Tidak melakukan apapun supaya jendela tidak tertutup
+        }
+    };
+
+    
     public JFrameBuatPurchaseOrder(JFrameGudang inventoryDashboardFrame) {
         this.inventoryDashboardFrame = inventoryDashboardFrame;
+        
+        this.addWindowListener(defaultWindowListener);
         
         initComponents();
         this.setLocationRelativeTo(null);
         setTitle("Toko Buku - Buat Purchase Order");
-        
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                int option = JOptionPane.showConfirmDialog(JFrameBuatPurchaseOrder.this,
-                        "Apakah Kamu Yakin Ingin Keluar?",
-                        "Konfirmasi Keluar", JOptionPane.YES_NO_OPTION);
-                if(option == JOptionPane.YES_OPTION){
-                    JFrameBuatPurchaseOrder.this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                    JFrameBuatPurchaseOrder.this.setVisible(false);
-                    inventoryDashboardFrame.setEnabled(true);
-                    inventoryDashboardFrame.requestFocus();
-                } else {
-                    JFrameBuatPurchaseOrder.this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                }
-            }
-        });
         
         mengaturHeaderTabel();
         dataKeComboBox(JComboBox_vendor);
@@ -275,29 +294,32 @@ public class JFrameBuatPurchaseOrder extends javax.swing.JFrame {
     }
 
     private void poCondition(String key){
+        // Bersihkan listener lama
+        for (WindowListener wl : this.getWindowListeners()) {
+            this.removeWindowListener(wl);
+        }
+
         switch (key) {
             case "PoChecked" -> {
-                // button
+                this.addWindowListener(poCheckedWindowListener);
+
                 JButton_cekKetersediaan.setEnabled(false);
                 JButton_buatPO.setEnabled(true);
                 JButton_batalBuatPO.setEnabled(true);
                 JButton_keluar.setEnabled(false);
-                // jtable
                 JTable_bukuVendor.setEnabled(false);
-                // jtextfield
                 JTextfield_pencarian.setEditable(false);
                 JButton_resetInput.setEnabled(false);
             }
-                
-            case "PoCreated" -> {
-                // button
+
+            case "PoCreated", "PoCanceled" -> {
+                this.addWindowListener(defaultWindowListener);
+
                 JButton_cekKetersediaan.setEnabled(true);
                 JButton_buatPO.setEnabled(false);
                 JButton_batalBuatPO.setEnabled(false);
                 JButton_keluar.setEnabled(true);
-                // jtable
                 JTable_bukuVendor.setEnabled(true);
-                // jtextfield
                 JTextfield_pencarian.setEditable(true);
                 JTextfield_isbn.setText("");
                 JTextfield_judulBuku.setText("");
@@ -306,32 +328,10 @@ public class JFrameBuatPurchaseOrder extends javax.swing.JFrame {
                 JTextfield_jumlahBuku.setText("");
                 TotalPriceLabel.setText("Rp. 0");
                 JButton_resetInput.setEnabled(true);
-            }
-                
-            case "PoCanceled" -> {
-                // button
-                JButton_cekKetersediaan.setEnabled(true);
-                JButton_buatPO.setEnabled(false);
-                JButton_batalBuatPO.setEnabled(false);
-                JButton_keluar.setEnabled(true);
-                // jtable
-                JTable_bukuVendor.setEnabled(true);
-                // jtextfield
-                JTextfield_pencarian.setEditable(true);
-                JTextfield_isbn.setText("");
-                JTextfield_judulBuku.setText("");
-                JComboBox_vendor.setSelectedIndex(0);
-                JTexfield_hargaSatuanBuku.setText("");
-                JTextfield_jumlahBuku.setText("");
-                TotalPriceLabel.setText("Rp. 0");
-                JButton_resetInput.setEnabled(true);
-            }
-                
-            default -> {
             }
         }
     }
-    
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
