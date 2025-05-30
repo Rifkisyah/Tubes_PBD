@@ -286,6 +286,7 @@ public class JFrameBuatPurchaseOrder extends javax.swing.JFrame {
                 JTable_bukuVendor.setEnabled(false);
                 // jtextfield
                 JTextfield_pencarian.setEditable(false);
+                JButton_resetInput.setEnabled(false);
             }
                 
             case "PoCreated" -> {
@@ -303,6 +304,8 @@ public class JFrameBuatPurchaseOrder extends javax.swing.JFrame {
                 JComboBox_vendor.setSelectedIndex(0);
                 JTexfield_hargaSatuanBuku.setText("");
                 JTextfield_jumlahBuku.setText("");
+                TotalPriceLabel.setText("Rp. 0");
+                JButton_resetInput.setEnabled(true);
             }
                 
             case "PoCanceled" -> {
@@ -320,6 +323,8 @@ public class JFrameBuatPurchaseOrder extends javax.swing.JFrame {
                 JComboBox_vendor.setSelectedIndex(0);
                 JTexfield_hargaSatuanBuku.setText("");
                 JTextfield_jumlahBuku.setText("");
+                TotalPriceLabel.setText("Rp. 0");
+                JButton_resetInput.setEnabled(true);
             }
                 
             default -> {
@@ -937,7 +942,7 @@ public class JFrameBuatPurchaseOrder extends javax.swing.JFrame {
         JComboBox_vendor.setSelectedIndex(0);
         JTexfield_hargaSatuanBuku.setText("");
         JTextfield_jumlahBuku.setText("");
-        
+
         JButton_buatPO.setEnabled(false);
         JButton_batalBuatPO.setEnabled(false);
         JButton_cekKetersediaan.setEnabled(true);

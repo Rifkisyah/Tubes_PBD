@@ -9,6 +9,8 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.JFrame;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 /**
  *
@@ -47,6 +49,23 @@ public class JFrameStokBuku extends javax.swing.JFrame {
 
         setHeaderTable();
 
+        JTexfield_search.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                performSearch(JTexfield_search.getText().trim());
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                performSearch(JTexfield_search.getText().trim());
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                performSearch(JTexfield_search.getText().trim());
+            }
+            
+        });
     }
     
     private void columnSizing(){
@@ -135,23 +154,21 @@ public class JFrameStokBuku extends javax.swing.JFrame {
 
                 if (detailMasterBuku.getResultSet().isBeforeFirst()) {
                     while (detailMasterBuku.getResultSet().next()) {
-                        Object[] fieldx = new Object[12];
-                        fieldx[0] = detailMasterBuku.getResultSet().getString("id_PO");
-                        fieldx[1] = detailMasterBuku.getResultSet().getString("id_pegawai");
-                        fieldx[2] = detailMasterBuku.getResultSet().getString("nama_pegawai");
-                        fieldx[3] = detailMasterBuku.getResultSet().getString("id_vendor");
-                        fieldx[4] = detailMasterBuku.getResultSet().getString("nama_vendor");
-                        fieldx[5] = detailMasterBuku.getResultSet().getString("isbn");
-                        fieldx[6] = detailMasterBuku.getResultSet().getString("judul_buku");
-                        fieldx[7] = detailMasterBuku.getResultSet().getString("tanggal_PO");
-                        fieldx[8] = detailMasterBuku.getResultSet().getString("estimasi_tanggal_datang");
-                        fieldx[9] = detailMasterBuku.getResultSet().getInt("jumlah_PO");
-                        fieldx[10] = detailMasterBuku.getResultSet().getDouble("total_biaya");
-                        fieldx[11] = detailMasterBuku.getResultSet().getString("status_PO");
+                    Object[] fieldx = new Object[10];
+                        fieldx[0] = detailMasterBuku.getResultSet().getString("id_detail_master_buku");
+                        fieldx[1] = detailMasterBuku.getResultSet().getString("isbn");
+                        fieldx[2] = detailMasterBuku.getResultSet().getString("judul_buku");
+                        fieldx[3] = detailMasterBuku.getResultSet().getString("kode_rak");
+                        fieldx[4] = detailMasterBuku.getResultSet().getString("nama_rak");
+                        fieldx[5] = detailMasterBuku.getResultSet().getString("id_vendor");
+                        fieldx[6] = detailMasterBuku.getResultSet().getString("nama_vendor");
+                        fieldx[7] = detailMasterBuku.getResultSet().getString("stock_buku");
+                        fieldx[8] = detailMasterBuku.getResultSet().getString("tanggal_update_stock");
+                        fieldx[9] = detailMasterBuku.getResultSet().getString("harga_satuan");
                         this.model.addRow(fieldx);
                     }
                 } else {
-                    JOptionPane.showMessageDialog(this, "Pegawai Tidak Ditemukan!", "Gagal Mencari Rak", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Buku Tidak Ditemukan!", "informasi", JOptionPane.INFORMATION_MESSAGE);
                 }
             }
         } catch (SQLException ex) {

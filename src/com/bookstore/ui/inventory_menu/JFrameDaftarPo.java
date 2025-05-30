@@ -54,22 +54,21 @@ public class JFrameDaftarPo extends javax.swing.JFrame {
         });
         
         setHeaderTable();
-        dataToComboBox();
         
-        search_field.getDocument().addDocumentListener(new DocumentListener() {
+        JTexfield_search.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
-                performSearch(search_field.getText().trim());
+                performSearch(JTexfield_search.getText().trim());
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                performSearch(search_field.getText().trim());
+                performSearch(JTexfield_search.getText().trim());
             }
 
             @Override
             public void changedUpdate(DocumentEvent e) {
-                performSearch(search_field.getText().trim());
+                performSearch(JTexfield_search.getText().trim());
             }
             
         });
@@ -136,39 +135,6 @@ public class JFrameDaftarPo extends javax.swing.JFrame {
             ex.printStackTrace();
         }
     }
-
-    private void dataToComboBox() {
-        PurchaseOrder purchaseOrder = new PurchaseOrder();
-        
-        try {
-            purchaseOrder.getSemuaPo();
-
-            // Simpan item index ke-0
-            Object firstItem = null;
-            if (filterSearch.getItemCount() > 0) {
-                firstItem = filterSearch.getItemAt(0);
-            }
-
-            // Hapus semua item, lalu tambahkan kembali item index 0
-            filterSearch.removeAllItems();
-            if (firstItem != null) {
-                filterSearch.addItem(firstItem.toString()); // tambah kembali item 0
-            }
-
-            // Tambahkan data dari database
-            while (purchaseOrder.getResultSet().next()) {
-                String status = purchaseOrder.getResultSet().getString("status_po");
-
-                // Hindari duplikat dengan index 0 (opsional)
-                if (firstItem == null || !firstItem.toString().equals(status)) {
-                    filterSearch.addItem(status);
-                }
-            }
-
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-    }
     
     private void setHeaderTable(){
         this.model = new DefaultTableModel();
@@ -201,33 +167,28 @@ public class JFrameDaftarPo extends javax.swing.JFrame {
             if (search_value == null || search_value.trim().isEmpty()) {
                 dataToTable();
             } else {
-                String statusName = (String) filterSearch.getSelectedItem();
-                
-                if(statusName.equals("-- Pilih Filter Status PO --")){
-                    purchaseOrder.getPencarianDataTabelPo(search_value);
-                } else {
-                    purchaseOrder.getPencarianDataTabelPoBerdasarkanFilterStatus(search_value, statusName);
-                }
+                purchaseOrder.getPencarianDataTabelPo(search_value);
 
                 if (purchaseOrder.getResultSet().isBeforeFirst()) {
                     while (purchaseOrder.getResultSet().next()) {
-                        Object[] fieldx = new Object[12];
-                        fieldx[0] = purchaseOrder.getResultSet().getString("id_PO");
-                        fieldx[1] = purchaseOrder.getResultSet().getString("id_pegawai");
-                        fieldx[2] = purchaseOrder.getResultSet().getString("nama_pegawai");
-                        fieldx[3] = purchaseOrder.getResultSet().getString("id_vendor");
-                        fieldx[4] = purchaseOrder.getResultSet().getString("nama_vendor");
-                        fieldx[5] = purchaseOrder.getResultSet().getString("isbn");
-                        fieldx[6] = purchaseOrder.getResultSet().getString("judul_buku");
-                        fieldx[7] = purchaseOrder.getResultSet().getString("tanggal_PO");
-                        fieldx[8] = purchaseOrder.getResultSet().getString("estimasi_tanggal_datang");
-                        fieldx[9] = purchaseOrder.getResultSet().getInt("jumlah_PO");
-                        fieldx[10] = purchaseOrder.getResultSet().getDouble("total_biaya");
-                        fieldx[11] = purchaseOrder.getResultSet().getString("status_PO");
+                        Object[] fieldx = new Object[13];
+                            fieldx[0] = purchaseOrder.getResultSet().getString("id_PO");
+                            fieldx[1] = purchaseOrder.getResultSet().getString("id_pegawai");
+                            fieldx[2] = purchaseOrder.getResultSet().getString("nama");
+                            fieldx[3] = purchaseOrder.getResultSet().getString("id_vendor");
+                            fieldx[4] = purchaseOrder.getResultSet().getString("nama_vendor");
+                            fieldx[5] = purchaseOrder.getResultSet().getString("isbn");
+                            fieldx[6] = purchaseOrder.getResultSet().getString("judul_buku");
+                            fieldx[7] = purchaseOrder.getResultSet().getString("tanggal_PO");
+                            fieldx[8] = purchaseOrder.getResultSet().getString("estimasi_tanggal_datang");
+                            fieldx[9] = purchaseOrder.getResultSet().getInt("jumlah_PO");
+                            fieldx[10] = purchaseOrder.getResultSet().getInt("jumlah_diterima");
+                            fieldx[11] = purchaseOrder.getResultSet().getDouble("total_biaya");
+                            fieldx[12] = purchaseOrder.getResultSet().getString("status_PO");
                         this.model.addRow(fieldx);
                     }
                 } else {
-                    JOptionPane.showMessageDialog(this, "Pegawai Tidak Ditemukan!", "Gagal Mencari Rak", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Po Tidak Ditemukan!", "informasi", JOptionPane.INFORMATION_MESSAGE);
                 }
             }
         } catch (SQLException ex) {
@@ -252,7 +213,6 @@ public class JFrameDaftarPo extends javax.swing.JFrame {
         CloseButton = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
         JTexfield_search = new javax.swing.JTextField();
-        filterSearch = new javax.swing.JComboBox<>();
 
         search_field.setFont(new java.awt.Font("Ebrima", 0, 14)); // NOI18N
         search_field.addActionListener(new java.awt.event.ActionListener() {
@@ -308,13 +268,6 @@ public class JFrameDaftarPo extends javax.swing.JFrame {
             }
         });
 
-        filterSearch.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "-- Pilih Filter Status PO --" }));
-        filterSearch.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                filterSearchActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -335,9 +288,7 @@ public class JFrameDaftarPo extends javax.swing.JFrame {
                                     .addGroup(jPanel1Layout.createSequentialGroup()
                                         .addComponent(jLabel3)
                                         .addGap(18, 18, 18)
-                                        .addComponent(JTexfield_search)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(filterSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                        .addComponent(JTexfield_search)))
                                 .addGap(17, 17, 17))))))
         );
         jPanel1Layout.setVerticalGroup(
@@ -346,11 +297,9 @@ public class JFrameDaftarPo extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(31, 31, 31)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(JTexfield_search, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(filterSearch))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(JTexfield_search, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -383,63 +332,13 @@ public class JFrameDaftarPo extends javax.swing.JFrame {
     }//GEN-LAST:event_CloseButtonActionPerformed
 
     private void search_fieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_search_fieldActionPerformed
-        String search_value = search_field.getText().trim();
-        performSearch(search_value);
+        // nothing
     }//GEN-LAST:event_search_fieldActionPerformed
 
     private void JTexfield_searchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_JTexfield_searchActionPerformed
-        String search_value = search_field.getText().trim();
+        String search_value = JTexfield_search.getText().trim();
         performSearch(search_value);
     }//GEN-LAST:event_JTexfield_searchActionPerformed
-
-    private void filterSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filterSearchActionPerformed
-        PurchaseOrder purchaseOrder = new PurchaseOrder();
-        
-        if(this.filterComboBoxIntialize){
-            String statusName = (String) filterSearch.getSelectedItem();
-            String search_value = JTexfield_search.getText();
-            search_field.setText("");
-
-            if (statusName == null || statusName.equals("-- Pilih Filter Vendor --")) {
-                dataToTable();
-                return;
-            } else {
-                model.getDataVector().removeAllElements();
-                model.fireTableDataChanged();
-
-                try {
-                    if (statusName.trim().isEmpty()) {
-                        performSearch(statusName);
-                    } else {
-                        purchaseOrder.getPencarianDataTabelPoBerdasarkanFilterStatus(search_value, statusName);
-
-                        if (purchaseOrder.getResultSet().isBeforeFirst()) {
-                            while (purchaseOrder.getResultSet().next()) {
-                                Object[] fieldx = new Object[12];
-                                fieldx[0] = purchaseOrder.getResultSet().getString("id_PO");
-                                fieldx[1] = purchaseOrder.getResultSet().getString("id_pegawai");
-                                fieldx[2] = purchaseOrder.getResultSet().getString("nama_pegawai");
-                                fieldx[3] = purchaseOrder.getResultSet().getString("id_vendor");
-                                fieldx[4] = purchaseOrder.getResultSet().getString("nama_vendor");
-                                fieldx[5] = purchaseOrder.getResultSet().getString("isbn");
-                                fieldx[6] = purchaseOrder.getResultSet().getString("judul_buku");
-                                fieldx[7] = purchaseOrder.getResultSet().getString("tanggal_PO");
-                                fieldx[8] = purchaseOrder.getResultSet().getString("estimasi_tanggal_datang");
-                                fieldx[9] = purchaseOrder.getResultSet().getInt("jumlah_PO");
-                                fieldx[10] = purchaseOrder.getResultSet().getDouble("total_biaya");
-                                fieldx[11] = purchaseOrder.getResultSet().getString("status_PO");
-                                this.model.addRow(fieldx);
-                            }
-                        } else {
-                            JOptionPane.showMessageDialog(this, "Buku Tidak Ditemukan!", "Gagal Mencari Rak", JOptionPane.ERROR_MESSAGE);
-                        }
-                    }
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
-            }
-        }
-    }//GEN-LAST:event_filterSearchActionPerformed
 
     /**
      * @param args the command line arguments
@@ -449,7 +348,6 @@ public class JFrameDaftarPo extends javax.swing.JFrame {
     private javax.swing.JButton CloseButton;
     private javax.swing.JTextField JTexfield_search;
     private javax.swing.JTable POTabel;
-    private javax.swing.JComboBox<String> filterSearch;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;

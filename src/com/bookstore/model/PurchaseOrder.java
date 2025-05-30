@@ -122,6 +122,18 @@ public class PurchaseOrder {
         }
     }
     
+    public void getStatusPo() {
+        this.mysqlConnection = new MysqlConnection();
+        try {
+            String query = "SELECT DISTINCT po.status_po FROM t_purchaseorder po ORDER BY po.status_po ASC";
+            this.pstmt = mysqlConnection.getConnection().prepareStatement(query);
+            this.rsltst = this.pstmt.executeQuery();
+        } catch (SQLException | ClassNotFoundException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    
     public void getSemuaDataBerdasarkanStatus(String status1, String status2){
         this.mysqlConnection = new MysqlConnection();
         
@@ -179,12 +191,14 @@ public class PurchaseOrder {
         try {
             String query =
                 "SELECT " +
-                "po.id_po, po.id_pegawai, po.id_vendor, mb.judul_buku, " +
+                "po.id_po, po.id_pegawai, ap.nama, po.id_vendor, vd.nama_vendor, mb.judul_buku, " +
                 "po.isbn, po.tanggal_po, po.estimasi_tanggal_datang, " +
                 "po.jumlah_po, po.jumlah_diterima, po.total_biaya, po.status_po " +
                 "FROM t_purchaseorder po " +
-                "LEFT JOIN t_masterbuku mb ON po.isbn = mb.isbn " +
-                "WHERE po.isbn LIKE ? OR mb.judul_buku LIKE ?) " +
+                "JOIN t_masterbuku mb ON po.isbn = mb.isbn " +
+                "JOIN t_akunpegawai ap ON po.id_pegawai = ap.id_pegawai " +
+                "JOIN t_vendor vd ON po.id_vendor = vd.id_vendor " +
+                "WHERE po.isbn LIKE ? OR po.id_po LIKE ? " +
                 "ORDER BY po.id_po ASC";
 
 
@@ -231,12 +245,14 @@ public class PurchaseOrder {
         try {
             String select =
                 "SELECT " +
-                "po.id_po, po.id_pegawai, po.id_vendor, mb.judul_buku, " +
+                "po.id_po, po.id_pegawai, ap.nama, po.id_vendor, vd.nama_vendor, mb.judul_buku, " +
                 "po.isbn, po.tanggal_po, po.estimasi_tanggal_datang, " +
                 "po.jumlah_po, po.jumlah_diterima, po.total_biaya, po.status_po " +
                 "FROM t_purchaseorder po " +
                 "LEFT JOIN t_masterbuku mb ON po.isbn = mb.isbn " +
-                "WHERE po.isbn LIKE ? OR mb.judul_buku LIKE ? AND po.status_po = ? " +
+                "JOIN t_akunpegawai ap ON po.id_pegawai = ap.id_pegawai " +
+                "JOIN t_vendor vd ON po.id_vendor = vd.id_vendor " +
+                "WHERE (po.isbn LIKE ? OR mb.judul_buku LIKE ?) AND po.status_po = ? " +
                 "ORDER BY po.id_po ASC";
 
         this.pstmt = mysqlConnection.getConnection().prepareStatement(select);

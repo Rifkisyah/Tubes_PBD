@@ -7,6 +7,7 @@ package com.bookstore.ui.inventory_menu;
 import com.bookstore.model.DetailMasterBuku;
 import com.bookstore.model.PurchaseOrder;
 import com.bookstore.model.Rak;
+import com.bookstore.model.Vendor;
 import com.bookstore.ui.JFrameGudang;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -65,7 +66,6 @@ public class JFrameTerimaPurchaseOrder extends javax.swing.JFrame {
         
         mengaturHeaderTabel();
         dataKeCombobox(JComboBox_rakBuku);
-        dataKeCombobox(JCombobox_filtervendor);
         
         this.filterComboBoxIntialize = true;
         
@@ -171,7 +171,6 @@ public class JFrameTerimaPurchaseOrder extends javax.swing.JFrame {
        
         try {
             rak.getSemuaData();
-
             // Simpan item index ke-0
             Object firstItem = null;
             if (comboBox.getItemCount() > 0) {
@@ -211,19 +210,7 @@ public class JFrameTerimaPurchaseOrder extends javax.swing.JFrame {
             if (search_value == null || search_value.trim().isEmpty()) {
                 dataKeTabel();
             } else {
-                String vendorName = (String) JCombobox_filtervendor.getSelectedItem();
-                
-                if(vendorName.equals("-- Pilih Filter Vendor --")){
-                    purchaseOrder.getPencarianDataTabelPo(search_value);
-                } else {
-                    String vendorId = this.vendorNameToIdMap.get(vendorName);
-
-                    if (vendorId == null || vendorId.trim().isEmpty()) {
-                        purchaseOrder.getPencarianDataTabelPo(search_value);
-                    } else {
-                        purchaseOrder.getPencarianDataTabelPoBerdasarkanFilterVendor(search_value, vendorId);
-                    }
-                }
+                purchaseOrder.getPencarianDataTabelPo(search_value);
 
                 if (purchaseOrder.getResultSet().isBeforeFirst()) {
                     while (purchaseOrder.getResultSet().next()) {
@@ -242,7 +229,7 @@ public class JFrameTerimaPurchaseOrder extends javax.swing.JFrame {
                         this.model.addRow(fieldx);
                     }
                 } else {
-                    JOptionPane.showMessageDialog(this, "Vendor Tidak Ditemukan!", "Gagal Mencari Rak", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Po Tidak Ditemukan!", "informasi", JOptionPane.INFORMATION_MESSAGE);
                 }
             }
         } catch (SQLException ex) {
@@ -312,7 +299,6 @@ public class JFrameTerimaPurchaseOrder extends javax.swing.JFrame {
         JTextfield_jumlahDiterima.setText("");
         JTextarea_keteranganPenerimaan.setText("");
         JComboBox_rakBuku.setSelectedIndex(0);
-        JCombobox_filtervendor.setSelectedIndex(0);
     }
     
     /**
@@ -331,7 +317,6 @@ public class JFrameTerimaPurchaseOrder extends javax.swing.JFrame {
         JTexfield_pencarianPO = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
         JTable_po = new javax.swing.JTable();
-        JCombobox_filtervendor = new javax.swing.JComboBox<>();
         jPanel3 = new javax.swing.JPanel();
         jLabel9 = new javax.swing.JLabel();
         JTextfield_jumlahDiterima = new javax.swing.JTextField();
@@ -395,13 +380,6 @@ public class JFrameTerimaPurchaseOrder extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(JTable_po);
 
-        JCombobox_filtervendor.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "-- Pilih Filter Vendor --" }));
-        JCombobox_filtervendor.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                JCombobox_filtervendorActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -415,9 +393,7 @@ public class JFrameTerimaPurchaseOrder extends javax.swing.JFrame {
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(JTexfield_pencarianPO)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(JCombobox_filtervendor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(JTexfield_pencarianPO)))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -426,8 +402,7 @@ public class JFrameTerimaPurchaseOrder extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(JTexfield_pencarianPO, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(JCombobox_filtervendor, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(JTexfield_pencarianPO, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 261, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -627,62 +602,6 @@ public class JFrameTerimaPurchaseOrder extends javax.swing.JFrame {
         JTextfield_idPo.setEnabled(false);
     }//GEN-LAST:event_JTable_poMouseClicked
 
-    private void JCombobox_filtervendorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_JCombobox_filtervendorActionPerformed
-        if(this.filterComboBoxIntialize){
-            String filterVendorName = (String) JCombobox_filtervendor.getSelectedItem();
-            String search_value = JTexfield_pencarianPO.getText().trim();
-                    
-            JTexfield_pencarianPO.setText("");
-            PurchaseOrder purchaseOrder = new PurchaseOrder();
-
-            if (filterVendorName.trim().isEmpty()) {
-                performSearch(filterVendorName);
-            } else if (search_value == null || search_value.trim().isEmpty()) {
-                dataKeTabel();
-            } else {
-                String vendorName = (String) JCombobox_filtervendor.getSelectedItem();
-                
-                if(vendorName.equals("-- Pilih Filter Vendor --")){
-                    purchaseOrder.getPencarianDataTabelPo(search_value);
-                } else {
-                    String vendorId = this.vendorNameToIdMap.get(vendorName);
-
-                    if (vendorId == null || vendorId.trim().isEmpty()) {
-                        purchaseOrder.getPencarianDataTabelPo(search_value);
-                    } else {
-                        purchaseOrder.getPencarianDataTabelPoBerdasarkanFilterVendor(search_value, vendorId);
-                    }
-                }
-
-                model.getDataVector().removeAllElements();
-                model.fireTableDataChanged();
-                try {
-                    if (purchaseOrder.getResultSet().isBeforeFirst()) {
-                        while (purchaseOrder.getResultSet().next()) {
-                            Object[] fieldx = new Object[11];
-                            fieldx[0] = purchaseOrder.getResultSet().getString("id_PO");
-                            fieldx[1] = purchaseOrder.getResultSet().getString("id_pegawai");
-                            fieldx[2] = purchaseOrder.getResultSet().getString("nama");
-                            fieldx[3] = purchaseOrder.getResultSet().getString("id_vendor");
-                            fieldx[4] = purchaseOrder.getResultSet().getString("nama_vendor");
-                            fieldx[5] = purchaseOrder.getResultSet().getString("isbn");
-                            fieldx[6] = purchaseOrder.getResultSet().getString("judul_buku");
-                            fieldx[7] = purchaseOrder.getResultSet().getString("tanggal_PO");
-                            fieldx[8] = purchaseOrder.getResultSet().getDate("estimasi_tanggal_datang");
-                            fieldx[9] = purchaseOrder.getResultSet().getInt("jumlah_PO");
-                            fieldx[10] = purchaseOrder.getResultSet().getDouble("total_biaya");
-                            this.model.addRow(fieldx);
-                        }
-                    } else {
-                        JOptionPane.showMessageDialog(this, "PO Tidak Ditemukan!", "Error", JOptionPane.ERROR_MESSAGE);
-                    }
-                } catch (SQLException ex) {
-                    Logger.getLogger(JFrameTerimaPurchaseOrder.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        }
-    }//GEN-LAST:event_JCombobox_filtervendorActionPerformed
-
     private void JButton_keluarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_JButton_keluarActionPerformed
         if(JOptionPane.showConfirmDialog(this, "Apakah Kamu Yakin Ingin Keluar?", "Konfirmasi Keluar", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION){
             this.setVisible(false);
@@ -860,7 +779,6 @@ public class JFrameTerimaPurchaseOrder extends javax.swing.JFrame {
     private javax.swing.JButton JButton_resetPo;
     private javax.swing.JButton JButton_terimaPo;
     private javax.swing.JComboBox<String> JComboBox_rakBuku;
-    private javax.swing.JComboBox<String> JCombobox_filtervendor;
     private javax.swing.JTable JTable_po;
     private javax.swing.JTextField JTexfield_pencarianPO;
     private javax.swing.JTextArea JTextarea_keteranganPenerimaan;
