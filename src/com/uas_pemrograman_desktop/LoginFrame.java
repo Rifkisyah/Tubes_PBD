@@ -165,7 +165,7 @@ public class LoginFrame extends javax.swing.JFrame {
                 jTextFieldUserId.setText("");
                 jPasswordField.setText("");
                 
-                MenuUtamaFrame menuUtamaFrame = new MenuUtamaFrame();
+                MenuUtamaFrame menuUtamaFrame = new MenuUtamaFrame(this);
                 this.setVisible(false);
                 menuUtamaFrame.setVisible(true);
             } else {

@@ -36,7 +36,7 @@ public class SupplierSearchFrame extends javax.swing.JFrame {
             @Override
             public void windowClosing(WindowEvent e) {
                 int option = JOptionPane.showConfirmDialog(SupplierSearchFrame.this,
-                        "Apakah Yakin Ingin Keluar",
+                        "Apakah Yakin Ingin Keluar Dari Menu Pencarian",
                         "Konfirmasi Keluar", JOptionPane.YES_NO_OPTION);
                 if(option == JOptionPane.YES_OPTION){
                     SupplierSearchFrame.this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -44,7 +44,7 @@ public class SupplierSearchFrame extends javax.swing.JFrame {
                     npof.setEnabled(true);
                     npof.requestFocus();
                 } else {
-                    SupplierSearchFrame.this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                    SupplierSearchFrame.this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
                 }
             }
         });

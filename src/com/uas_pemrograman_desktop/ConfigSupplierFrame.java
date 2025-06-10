@@ -42,7 +42,7 @@ public class ConfigSupplierFrame extends javax.swing.JFrame {
                 if(option == JOptionPane.YES_OPTION){
                     ConfigSupplierFrame.this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                     ConfigSupplierFrame.this.setVisible(false);
-                    muf.setEnabled(true);
+                    muf.setVisible(true);
                     muf.requestFocus();
                 }
             }
@@ -134,6 +134,7 @@ public class ConfigSupplierFrame extends javax.swing.JFrame {
         jLabel7 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
+        jButtonNewCodeSupplier = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTableSupplier = new javax.swing.JTable();
         jButtonKeluar = new javax.swing.JButton();
@@ -151,6 +152,9 @@ public class ConfigSupplierFrame extends javax.swing.JFrame {
         jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setText("Kode Supplier");
+
+        jTextFieldKodeSupplier.setEditable(false);
+        jTextFieldKodeSupplier.setEnabled(false);
 
         jLabel3.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(255, 255, 255));
@@ -198,6 +202,13 @@ public class ConfigSupplierFrame extends javax.swing.JFrame {
 
         jLabel10.setText(" ");
 
+        jButtonNewCodeSupplier.setText("Tambahkan Kode Supplier");
+        jButtonNewCodeSupplier.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonNewCodeSupplierActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -227,8 +238,9 @@ public class ConfigSupplierFrame extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(jTextFieldPICSupplier, javax.swing.GroupLayout.DEFAULT_SIZE, 281, Short.MAX_VALUE)
+                                    .addComponent(jTextFieldNamaSupplier)
                                     .addComponent(jTextFieldKodeSupplier)
-                                    .addComponent(jTextFieldNamaSupplier))
+                                    .addComponent(jButtonNewCodeSupplier, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                 .addGap(66, 66, 66)
                                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 356, Short.MAX_VALUE)
@@ -259,19 +271,21 @@ public class ConfigSupplierFrame extends javax.swing.JFrame {
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addGap(6, 43, Short.MAX_VALUE)
-                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jTextFieldKodeSupplier, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel2)))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                                .addGap(0, 0, Short.MAX_VALUE)
-                                .addComponent(jLabel3)))
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanel2Layout.createSequentialGroup()
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                            .addComponent(jTextFieldKodeSupplier, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(jLabel2)))
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                                        .addGap(0, 0, Short.MAX_VALUE)
+                                        .addComponent(jLabel3)))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jScrollPane2))
                             .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addGap(27, 27, 27)
+                                .addGap(58, 58, 58)
+                                .addComponent(jButtonNewCodeSupplier)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                     .addComponent(jLabel1)
                                     .addComponent(jTextFieldNamaSupplier, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -328,7 +342,7 @@ public class ConfigSupplierFrame extends javax.swing.JFrame {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jButtonKeluar)
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 888, Short.MAX_VALUE))
                 .addGap(24, 24, 24))
         );
         jPanel1Layout.setVerticalGroup(
@@ -339,7 +353,7 @@ public class ConfigSupplierFrame extends javax.swing.JFrame {
                 .addGap(5, 5, 5)
                 .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 236, Short.MAX_VALUE)
                 .addGap(30, 30, 30))
         );
 
@@ -371,7 +385,7 @@ public class ConfigSupplierFrame extends javax.swing.JFrame {
     private void jButtonKeluarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonKeluarActionPerformed
         if(JOptionPane.showConfirmDialog(this, "Apakah Kamu Yakin Untuk Keluar?", "konfirmasi", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION){
             this.setVisible(false);
-            muf.setEnabled(true);
+            muf.setVisible(true);
             muf.requestFocus();
         }
     }//GEN-LAST:event_jButtonKeluarActionPerformed
@@ -505,10 +519,47 @@ public class ConfigSupplierFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jButtonSimpanActionPerformed
 
+    private void jButtonNewCodeSupplierActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonNewCodeSupplierActionPerformed
+        try{
+            DbConnection dbc = new DbConnection();
+            
+            jTextFieldKodeSupplier.setText("");
+            
+            if(jTextFieldKodeSupplier.getText().trim().isEmpty()){
+                String queryCount = "SELECT COUNT(*) FROM tsupplier WHERE kodesupplier = ?";
+                PreparedStatement pstmt = dbc.getConnection().prepareStatement(queryCount);
+
+                String prefix = "SUP";
+                int counter = 1;
+                String newId;
+
+                while(true){
+                    newId = prefix + String.format("%03d", counter);
+                    pstmt.setString(1, newId);
+                    ResultSet rslt = pstmt.executeQuery();
+
+                    boolean exists = false;
+                    if(rslt.next()){
+                        exists = rslt.getInt(1) > 0;
+                    }
+
+                    if(exists == false){
+                        break;
+                    }
+                    counter++;
+                }
+                jTextFieldKodeSupplier.setText(newId);   
+            }
+        } catch (SQLException ex){
+            ex.printStackTrace();
+        }
+    }//GEN-LAST:event_jButtonNewCodeSupplierActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonHapus;
     private javax.swing.JButton jButtonKeluar;
+    private javax.swing.JButton jButtonNewCodeSupplier;
     private javax.swing.JButton jButtonResetInput;
     private javax.swing.JButton jButtonSimpan;
     private javax.swing.JLabel jLabel1;

@@ -14,11 +14,13 @@ import javax.swing.JOptionPane;
  * @author rifki
  */
 public class MenuUtamaFrame extends javax.swing.JFrame {
-
+    LoginFrame lf;
     /**
      * Creates new form MenuUtamaFrame
      */
-    public MenuUtamaFrame() {
+    public MenuUtamaFrame(LoginFrame lf) {
+        this.lf = lf;
+        
         initComponents();
         
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -49,6 +51,7 @@ public class MenuUtamaFrame extends javax.swing.JFrame {
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jButton2 = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
@@ -76,6 +79,14 @@ public class MenuUtamaFrame extends javax.swing.JFrame {
             }
         });
 
+        jButton3.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jButton3.setText("Terima Purchasing Order");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -86,7 +97,9 @@ public class MenuUtamaFrame extends javax.swing.JFrame {
                 .addContainerGap())
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGap(143, 143, 143)
-                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 297, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 297, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 297, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
@@ -96,7 +109,9 @@ public class MenuUtamaFrame extends javax.swing.JFrame {
                 .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addComponent(jButton2)
-                .addGap(72, 72, 72))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jButton3)
+                .addGap(33, 33, 33))
         );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -168,69 +183,40 @@ public class MenuUtamaFrame extends javax.swing.JFrame {
         ConfigSupplierFrame csf = new ConfigSupplierFrame(this);
         csf.setVisible(true);
         csf.requestFocus();
-        this.setEnabled(false);
+        this.setVisible(false);
     }//GEN-LAST:event_jMenuItemSupplierActionPerformed
 
     private void jMenuItemProdukActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemProdukActionPerformed
         ConfigProdukFrame cpf = new ConfigProdukFrame(this);
         cpf.setVisible(true);
         cpf.requestFocus();
-        this.setEnabled(false);
+        this.setVisible(false);
     }//GEN-LAST:event_jMenuItemProdukActionPerformed
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
         if(JOptionPane.showConfirmDialog(this, "Apakah Kamu Yakin Untuk Keluar?", "konfirmasi", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION){
-            this.setVisible(false);
-            LoginFrame lf = new LoginFrame();
-            lf.setVisible(true);
-            lf.requestFocus();
+            System.exit(0);
         }
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        NewPurchasingOrderFrame npo = new NewPurchasingOrderFrame();
+        NewPurchasingOrderFrame npo = new NewPurchasingOrderFrame(this);
         npo.setVisible(true);
         npo.requestFocus();
-        this.setEnabled(false);
+        this.setVisible(false);
     }//GEN-LAST:event_jButton2ActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(MenuUtamaFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(MenuUtamaFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(MenuUtamaFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(MenuUtamaFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        ReceivedPurchaseOrderFrame rpo = new ReceivedPurchaseOrderFrame(this);
+        rpo.setVisible(true);
+        rpo.requestFocus();
+        this.setVisible(false);
+    }//GEN-LAST:event_jButton3ActionPerformed
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new MenuUtamaFrame().setVisible(true);
-            }
-        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;

@@ -36,7 +36,7 @@ public class ProductSearchFrame extends javax.swing.JFrame {
             @Override
             public void windowClosing(WindowEvent e) {
                 int option = JOptionPane.showConfirmDialog(ProductSearchFrame.this,
-                        "Apakah Yakin Ingin Keluar",
+                        "Apakah Yakin Ingin Keluar Dari Menu Pencarian?",
                         "Konfirmasi Keluar", JOptionPane.YES_NO_OPTION);
                 if(option == JOptionPane.YES_OPTION){
                     ProductSearchFrame.this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -44,7 +44,7 @@ public class ProductSearchFrame extends javax.swing.JFrame {
                     npof.setEnabled(true);
                     npof.requestFocus();
                 } else {
-                    ProductSearchFrame.this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                    ProductSearchFrame.this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
                 }
             }
         });
@@ -52,30 +52,30 @@ public class ProductSearchFrame extends javax.swing.JFrame {
     
     private void setColSize(){
         TableColumn column;
-        jTableSupplier.setAutoResizeMode(jTableSupplier.AUTO_RESIZE_OFF);
-        column = jTableSupplier.getColumnModel().getColumn(0);
-        column.setPreferredWidth(150);
-        column = jTableSupplier.getColumnModel().getColumn(1);
-        column.setPreferredWidth(250);
-        column = jTableSupplier.getColumnModel().getColumn(2);
-        column.setPreferredWidth(150);
-        column = jTableSupplier.getColumnModel().getColumn(3);
-        column.setPreferredWidth(150);
-        column = jTableSupplier.getColumnModel().getColumn(4);
-        column.setPreferredWidth(150);
-        column = jTableSupplier.getColumnModel().getColumn(5);
-        column.setPreferredWidth(150);
-        column = jTableSupplier.getColumnModel().getColumn(6);
+        jTableProduk.setAutoResizeMode(jTableSupplier.AUTO_RESIZE_OFF);
+        column = jTableProduk.getColumnModel().getColumn(0);
+        column.setPreferredWidth(100);
+        column = jTableProduk.getColumnModel().getColumn(1);
         column.setPreferredWidth(200);
-        column = jTableSupplier.getColumnModel().getColumn(7);
-        column.setPreferredWidth(250);
+        column = jTableProduk.getColumnModel().getColumn(2);
+        column.setPreferredWidth(100);
+        column = jTableProduk.getColumnModel().getColumn(3);
+        column.setPreferredWidth(100);
+        column = jTableProduk.getColumnModel().getColumn(4);
+        column.setPreferredWidth(100);
+        column = jTableProduk.getColumnModel().getColumn(5);
+        column.setPreferredWidth(100);
+        column = jTableProduk.getColumnModel().getColumn(6);
+        column.setPreferredWidth(200);
+        column = jTableProduk.getColumnModel().getColumn(7);
+        column.setPreferredWidth(200);
     }
     
     private void setDataTable(){
         try{
             DbConnection dbc = new DbConnection();
             
-            String querySelect = "SELECT a.*, b.kodesupplier, b.namasupplier, c.namaproduk FROM tdetailproduk a JOIN tsupplier b ON a.kodesupplier = b.kodesupplier JOIN tmasterid ON a.itemid = c.itemid"; 
+            String querySelect = "SELECT a.*, b.kodesupplier, b.namasupplier, c.namaproduk FROM tdetailproduk a JOIN tsupplier b ON a.kodesupplier = b.kodesupplier JOIN tmasterid c ON a.itemid = c.itemid"; 
             PreparedStatement pstmt = dbc.getConnection().prepareStatement(querySelect);
             ResultSet rslt = pstmt.executeQuery();
                     
@@ -100,7 +100,7 @@ public class ProductSearchFrame extends javax.swing.JFrame {
     
     private void setHeaderTable(){
         this.dtm = new DefaultTableModel();
-        jTableSupplier.setModel(dtm);
+        jTableProduk.setModel(dtm);
         dtm.addColumn("ID Produk");
         dtm.addColumn("Nama Produk");
         dtm.addColumn("Harga");
@@ -286,12 +286,14 @@ public class ProductSearchFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jTextFieldPencarianNamaProdukActionPerformed
 
     private void jTableProdukMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTableProdukMouseClicked
-        this.npof.setKodeSupplier(dtm.getValueAt(jTableProduk.getSelectedRow(), 0) + "");
-        this.npof.setNamaSupplier(dtm.getValueAt(jTableProduk.getSelectedRow(), 1) + "");
-        this.npof.setAlamatSupplier(dtm.getValueAt(jTableProduk.getSelectedRow(), 2) + "");
-        this.npof.setPicSupplier(dtm.getValueAt(jTableProduk.getSelectedRow(), 3) + "");
+        this.npof.setIdProduk(dtm.getValueAt(jTableProduk.getSelectedRow(), 0) + "");
+        this.npof.setNamaProduk(dtm.getValueAt(jTableProduk.getSelectedRow(), 1) + "");
+        this.npof.setHargaProduk(dtm.getValueAt(jTableProduk.getSelectedRow(), 2) + "");
+        this.npof.setDiskonProduk(dtm.getValueAt(jTableProduk.getSelectedRow(), 3) + "");
+        this.npof.setCostPriceProduk(dtm.getValueAt(jTableProduk.getSelectedRow(), 4) + "");
+        this.npof.setInstockProduk(dtm.getValueAt(jTableProduk.getSelectedRow(), 5) + "");
         //  FIXME
-        jTextFieldKodeSupplier.setText(dtm.getValueAt(jTableProduk.getSelectedRow(), 0) + "");
+        jTextFieldIdProduk.setText(dtm.getValueAt(jTableProduk.getSelectedRow(), 0) + "");
     }//GEN-LAST:event_jTableProdukMouseClicked
 
 
